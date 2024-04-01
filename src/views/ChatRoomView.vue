@@ -20,8 +20,26 @@ import { library } from '@fortawesome/fontawesome-svg-core'
             </q-toolbar-title>
             <q-space />
             <div class="cursor-pointer" >
-                <font-awesome-icon :icon="['fas', 'user-plus']" style="color: black;" size="lg" />
+                <font-awesome-icon :icon="['fas', 'user-plus']" style="color: black;" size="lg"  @click="openDialog('blur(4px) saturate(150%)')"/>
             </div>
+            <div class="q-pa-md q-gutter-sm ">
+                    <q-dialog v-model="dialog" :backdrop-filter="backdropFilter">
+                      <q-card>
+                        <q-card-section class="row items-center q-pb-none text-h6 text-dark">
+                          Add User to group
+                        </q-card-section>
+
+                        <q-card-section class="text-dark">
+                          <q-input outlined v-model="user" @keyup.enter="" style="width: 20vw;" label="User name" />
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                          <q-btn color="secondary" label="Add" @click="" />
+                          <q-btn flat label="Close" color="primary" v-close-popup />
+                        </q-card-actions>
+                      </q-card>
+                    </q-dialog>
+                </div>
           </q-toolbar>
         </q-header>
         <q-page-container>
@@ -32,7 +50,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
           </q-page>
         </q-page-container>
       </q-layout>
-   
   </main>
 </template>
 
@@ -48,6 +65,8 @@ import axios from 'axios';
                     roomName: '',
                     admin: '',
                 },
+                dialog: false,
+                backdropFilter: '', 
             }
         },
         mounted() {
@@ -64,7 +83,18 @@ import axios from 'axios';
                 .then(res => {
                     this.room = res.data;
                 })
-            }
+            },
+            addUserToRoom(){
+                this.dialog = true;
+            },
+            openDialog(filter) {
+                if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+                this.backdropFilter = filter;
+                this.dialog = true;
+                } else {
+                console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+                }
+            },
         }
     }
 
