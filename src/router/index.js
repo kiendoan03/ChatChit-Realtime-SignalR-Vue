@@ -15,14 +15,6 @@ const router = createRouter({
             name: 'chat',
             component: ChatPrivateView
         },
-        {
-            path: '/login',
-            name: 'login',
-            component: () =>
-                import ('../views/LoginView.vue')
-        }
-
-
     ]
 })
 

@@ -1,5 +1,7 @@
 <template>
-    <div class="q-pa-md" style="max-width: 400px">
+    <h3 class="text-dark">Login</h3>
+    <div class="q-pa-md" style="width: 50vh;">
+        
       <q-form
         @submit="onSubmit"
         @reset="onReset"
@@ -49,6 +51,7 @@
                             console.log(response.data);
                             alert('Login successfully');
                             this.$router.push('/');
+                            this.$router.go();
                             localStorage.setItem('token', response.data.token);
                             localStorage.setItem('displayName', response.data.displayName);
                             localStorage.setItem('userId', response.data.id);
