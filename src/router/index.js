@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ChatLobbyView from '../views/ChatLobbyView.vue'
-import ChatPrivateView from '../views/ChatPrivateView.vue'
+import ChatRoomView from '../views/ChatRoomView.vue'
 
 const router = createRouter({
     history: createWebHistory(
@@ -11,10 +11,10 @@ const router = createRouter({
             component: ChatLobbyView
         },
         {
-            path: '/chat/:id',
-            name: 'chat',
-            component: ChatPrivateView
-        },
+            path: '/chatRoom/:id',
+            name: 'chatRoom',
+            component: ChatRoomView
+        }
     ]
 })
 

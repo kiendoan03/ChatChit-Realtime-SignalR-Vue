@@ -5,6 +5,7 @@
     import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
     library.add(fas)
+    
 
 </script>
 
@@ -22,9 +23,27 @@
               <span style="margin-right: 1vw">
                  <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="xl" />
               </span>
-             <span>
-               <font-awesome-icon :icon="['fas', 'user-group']" size="xl" />
-             </span>
+              <span>
+                <font-awesome-icon :icon="['fas', 'user-group']" size="xl" @click="openDialog('blur(4px) saturate(150%)')" />
+              </span>
+              <div class="q-pa-md q-gutter-sm ">
+                    <q-dialog v-model="dialog" :backdrop-filter="backdropFilter">
+                      <q-card>
+                        <q-card-section class="row items-center q-pb-none text-h6 text-dark">
+                          Add new group
+                        </q-card-section>
+
+                        <q-card-section class="text-dark">
+                          <q-input outlined v-model="roomName" @keyup.enter="addRoom" style="width: 20vw;" label="Room name" />
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                          <q-btn color="secondary" label="Add" @click="addRoom" />
+                          <q-btn flat label="Close" color="primary" v-close-popup />
+                        </q-card-actions>
+                      </q-card>
+                    </q-dialog>
+                </div>
             </div>
           </q-toolbar>
         </q-header>
@@ -34,7 +53,9 @@
               <q-scroll-area style="height: 38vmax; max-width: 30vmax;">
                 <nav class="route ">
                     <RouterLink to="/"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
-                    <RouterLink to="/chat" >Chat</RouterLink>
+                    <div v-for="room in rooms" :key="room.id">
+                      <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
+                    </div>
                 </nav>
               </q-scroll-area>
           </q-page>
@@ -58,6 +79,8 @@
   </template>
   
 <script>
+import axios from 'axios'
+import { RouterLink } from 'vue-router'
   export default {
     name: 'HeaderComponent',
     data() {
@@ -65,12 +88,18 @@
         user:{
           name: '',
           avatar: 'https://cdn.quasar.dev/img/avatar5.jpg',
-          id: ''
-        }
+          id: '',
+        },
+        roomName: '',
+        dialog: false,
+        backdropFilter: '',
+        rooms: [],
       }
     },
     mounted() {
       this.getUser();
+      var userId = this.user.id;
+      this.getRooms(userId);
     },
     methods: {
       logout() {
@@ -81,6 +110,31 @@
       getUser() {
         this.user.name = localStorage.getItem('displayName');
         this.user.id = localStorage.getItem('userId');
+      },
+      addRoom() {
+        axios.post('https://localhost:7014/api/Rooms', {
+          roomName: this.roomName,
+        })
+        .then(res => {
+          console.log(res.data);
+          this.dialog = false;
+          this.$router.go();
+        })
+      },
+      getRooms(userId) {
+        axios.get(`https://localhost:7014/api/Rooms?userId=${userId}`)
+        .then(res => {
+          this.rooms = res.data;
+          console.log(this.rooms);
+        })
+      },
+      openDialog(filter) {
+        if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+          this.backdropFilter = filter;
+          this.dialog = true;
+        } else {
+          console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+        }
       }
     }
   }         

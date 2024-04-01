@@ -34,7 +34,7 @@ library.add(fas)
   </div>
   <div class="q-pa-md row justify-center" >
     <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
-    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessage" style="width: 100%;"  label="Type your message" :dense="dense">
+    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessageToRoom" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar>
             <img src="https://cdn.quasar.dev/img/avatar5.jpg">
@@ -48,7 +48,7 @@ library.add(fas)
         </template>
 
         <template v-slot:after>
-          <div round dense flat @click="sendMessage" class="cursor-pointer">
+          <div round dense flat @click="sendMessageToRoom" class="cursor-pointer">
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
           </div>
         </template>
@@ -63,7 +63,7 @@ library.add(fas)
   import * as signalR from "@aspnet/signalr";
 
 export default {
-    name: 'ChatLobbyComponent',
+    name: 'ChatRoomComponent',
   data() {
     return {
       connection: null,
@@ -71,6 +71,11 @@ export default {
       text: "",
       user: "",
       userId: "",
+      room: {
+        id: '',
+        roomName: '',
+        admin: '',
+      },
       now: Date.now()
     };
    
@@ -80,7 +85,15 @@ export default {
   },
   mounted() {
     this.getUser();
+    this.room.id = this.$route.params.id;
+    // this.getHistoryChatRoom(this.$route.params.id);
   },
+  watch: {
+            '$route.params.id': function(newId) {
+                this.getHistoryChatRoom(newId);
+                this.messages = [];
+            }
+        },
   methods: {
     scrollToBottom() {
       this.$nextTick(() => {
@@ -96,48 +109,52 @@ export default {
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
         this.listenForMessages();
-        this.getHistory();
-        this.listenForChatHistory();
+        this.getHistoryChatRoom( this.room.id);
+        this.listenForHistoryChatRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
-    getHistory() {
-      this.connection.invoke("GetChatHistoryLobby")
-      .catch((error) => {
-        console.error("Error getting chat history: ", error);
-      });
-    },
-    listenForChatHistory() {
-      this.connection.on("ReceiveChatHistoryLobby", (messages) => {
-        // Cập nhật dữ liệu lịch sử chat
-      
-        messages.forEach(message => {
-          this.messages.push( {sender:message.fromUser,content:message.content} );
-        });
-        this.scrollToBottom();
-      }); 
-    },
     listenForMessages() {
-      // this.connection.on("ReceiveMessage", (sender, content) => {
-      //   this.messages.push( {sender,content} );
-      // });
       this.connection.on("ReceiveMessage", (message) => {
         this.messages.push( {sender:message.fromUser,content:message.content} );
+        console.log(message);
         this.scrollToBottom();
       });
     },
-    sendMessage() {
-      if (this.text.trim() !== "") {
-        this.connection.invoke("SendMessage", this.userId, this.text)
-          .then(() => {
-            console.log("Message sent successfully");
-            this.text = ""; // Clear input field after sending message
-          })
-          .catch((error) => {
+    sendMessageToRoom() {
+        try {
+            if (this.text.trim() !== "") {
+                console.log("Sending message to room...");
+                this.connection.invoke("SendToRoom", this.userId,this.room.id, this.text)
+                    .then(() => {
+                        console.log("Message sent successfully");
+                        this.text = ""; // Clear input field after sending message
+                    })
+                    .catch((error) => {
+                        console.error("Error sending message: ", error);
+                        // Xử lý lỗi ở đây
+                    });
+            }
+        } catch (error) {
             console.error("Error sending message: ", error);
-          });
-      }
+            // Xử lý lỗi ở đây
+        }
+    },
+    getHistoryChatRoom(roomId){
+        this.connection.invoke("GetHistoryChatRoom", roomId)
+        .catch((error) => {
+            console.error("Error getting chat history: ", error);
+        });
+    },
+    listenForHistoryChatRoom(){
+        this.connection.on("ReceiveChatHistoryRoom", (messages) => {
+            // Cập nhật dữ liệu lịch sử chat
+            messages.forEach(message => {
+                this.messages.push( {sender:message.fromUser,content:message.content} );
+            });
+            this.scrollToBottom();
+        }); 
     },
     getUser() {
       if (localStorage.getItem('token')){
