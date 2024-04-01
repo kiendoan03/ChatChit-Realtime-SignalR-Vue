@@ -12,7 +12,7 @@ library.add(fas)
 </script>
 
 <template >
-  <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:36.69vmax;"  >
+  <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
     <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         :name="[message.sender]"
@@ -169,5 +169,5 @@ export default {
 </script>
 
 <style scoped>
-  
+
 </style>

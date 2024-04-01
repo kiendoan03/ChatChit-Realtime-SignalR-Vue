@@ -10,7 +10,7 @@
 </script>
 
 <template>
-    <div class="q-pa-md bg-dark" >
+    <div class="q-pa-md bg-dark" style="border-radius: 1%;" >
       <q-layout view="lHh lpr lFf" container style="height: 45.5vmax;" class="shadow-2 rounded-borders">
         <q-header elevated class="bg-dark">
           <q-toolbar>
@@ -21,10 +21,10 @@
             <q-space />
             <div class="cursor-pointer" >
               <span style="margin-right: 1vw">
-                 <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="xl" />
+                 <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="lg" />
               </span>
               <span>
-                <font-awesome-icon :icon="['fas', 'user-group']" size="xl" @click="openDialog('blur(4px) saturate(150%)')" />
+                <font-awesome-icon :icon="['fas', 'user-group']" size="lg" @click="openDialog('blur(4px) saturate(150%)')" />
               </span>
               <div class="q-pa-md q-gutter-sm ">
                     <q-dialog v-model="dialog" :backdrop-filter="backdropFilter">
