@@ -17,6 +17,15 @@
             <q-toolbar-title>
               <strong>O2 Tech</strong>
             </q-toolbar-title>
+            <q-space />
+            <div class="cursor-pointer" >
+              <span style="margin-right: 1vw">
+                 <font-awesome-icon :icon="['fas', 'magnifying-glass']" size="xl" />
+              </span>
+             <span>
+               <font-awesome-icon :icon="['fas', 'user-group']" size="xl" />
+             </span>
+            </div>
           </q-toolbar>
         </q-header>
   
@@ -32,6 +41,12 @@
         </q-page-container>
         <q-footer elevated class="bg-dark text-white">
           <q-toolbar>
+            <div class="user">
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+              </q-avatar>
+              <span style="margin-left: 1.5vh;">John Doe</span>
+            </div>
             <q-space />
             <div class="cursor-pointer" @click="logout">
               <font-awesome-icon :icon="['fas', 'right-from-bracket']" size="xl" />
