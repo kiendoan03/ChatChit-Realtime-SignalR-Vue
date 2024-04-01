@@ -45,7 +45,7 @@
               <q-avatar>
                 <img src="https://cdn.quasar.dev/img/avatar5.jpg">
               </q-avatar>
-              <span style="margin-left: 1.5vh;">John Doe</span>
+              <span style="margin-left: 1.5vh;">{{ this.user.name }}</span>
             </div>
             <q-space />
             <div class="cursor-pointer" @click="logout">
@@ -60,11 +60,27 @@
 <script>
   export default {
     name: 'HeaderComponent',
+    data() {
+      return {
+        user:{
+          name: '',
+          avatar: 'https://cdn.quasar.dev/img/avatar5.jpg',
+          id: ''
+        }
+      }
+    },
+    mounted() {
+      this.getUser();
+    },
     methods: {
       logout() {
         localStorage.clear();
         this.$router.push('/');
         this.$router.go();
+      },
+      getUser() {
+        this.user.name = localStorage.getItem('displayName');
+        this.user.id = localStorage.getItem('userId');
       }
     }
   }         

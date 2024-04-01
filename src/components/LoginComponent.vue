@@ -59,11 +59,12 @@
                     console.error('Error login:', error);
                 });
             },
-      },
-      onReset() {
+        onReset() {
         this.model.account.username = '';
         this.model.account.password = '';
       }
+      },
+      
     }
   </script>
   
