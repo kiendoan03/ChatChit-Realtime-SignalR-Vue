@@ -29,6 +29,13 @@ library.add(fas)
         :text="[message.content]"
         stamp="4 minutes ago" 
       />
+      <!-- <q-chat-message
+        name="Jane"
+        avatar="https://cdn.quasar.dev/img/avatar5.jpg"
+        bg-color="primary"
+      >
+        <q-spinner-dots size="2rem" />
+      </q-chat-message> -->
       <!-- -->
     </div>
   </div>

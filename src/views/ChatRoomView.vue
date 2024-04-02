@@ -29,12 +29,28 @@ import { library } from '@fortawesome/fontawesome-svg-core'
                           Add User to group
                         </q-card-section>
 
-                        <q-card-section class="text-dark">
-                          <q-input outlined v-model="user" @keyup.enter="" style="width: 20vw;" label="User name" />
+                        <q-card-section class="text-dark scroll " style="width: 20vmax; height: 15vmax;">
+                          <q-list>
+                            <q-item v-for="user in users" :key="user.id">
+                              <q-item-section>
+                                <q-checkbox v-model="user.checked"  :value="user.id" style="text-align: center;justify-content: center;">
+                                 <q-item-section >
+                                    <q-avatar>
+                                      <img src="https://cdn.quasar.dev/img/avatar5.jpg" >
+                                    </q-avatar>
+                                  </q-item-section>
+                                  <!-- <q-item-section> -->
+                                     <q-item-label>{{ user.displayName }}</q-item-label>
+                                  <!-- </q-item-section> -->
+                                </q-checkbox>
+                              </q-item-section>
+                              
+                            </q-item>
+                          </q-list>
                         </q-card-section>
 
                         <q-card-actions align="right">
-                          <q-btn color="secondary" label="Add" @click="" />
+                          <q-btn color="secondary" label="Add" @click="addUsersToGroup" />
                           <q-btn flat label="Close" color="primary" v-close-popup />
                         </q-card-actions>
                       </q-card>
@@ -67,14 +83,18 @@ import axios from 'axios';
                 },
                 dialog: false,
                 backdropFilter: '', 
+                users: [],
+                selectedUsers: [], 
             }
         },
         mounted() {
         this.getRoom(this.$route.params.id);
+        this.getUsers(this.$route.params.id);  
         },
         watch: {
             '$route.params.id': function(newId) {
                 this.getRoom(newId);
+                this.getUsers(newId);
             }
         },
         methods:{
@@ -84,8 +104,20 @@ import axios from 'axios';
                     this.room = res.data;
                 })
             },
-            addUserToRoom(){
-                this.dialog = true;
+            getUsers(roomId) {
+            axios.get('https://localhost:7014/api/Users/GetUserNotInGroup?groupId='+roomId)
+                .then(res => {
+                    this.users = res.data; 
+                    console.log(this.users);
+                });
+            },
+            addUsersToGroup() {
+              // Thêm logic để thêm người dùng được chọn vào nhóm ở đây
+              this.selectedUsers = this.users.filter(user => user.checked).map(user => user.id);
+              console.log(this.selectedUsers); // Hiển thị ID của người dùng được chọn
+              
+              // Reset các checkbox
+              this.users.forEach(user => user.checked = false);
             },
             openDialog(filter) {
                 if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
@@ -99,3 +131,8 @@ import axios from 'axios';
     }
 
 </script>
+<style>
+  .bg-selected {
+    background-color: lightblue; /* Đổi màu nền khi được chọn */
+  }
+</style>

@@ -5,6 +5,6 @@ import ChatLobby from '../components/ChatLobbyComponent.vue'
 <template>
   <main>
     <h3 class="text-dark">Chat Private</h3>
-    <ChatLobby/>
+    <!-- <ChatLobby/> -->
   </main>
 </template>

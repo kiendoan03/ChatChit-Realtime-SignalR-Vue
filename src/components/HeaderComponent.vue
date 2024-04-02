@@ -56,6 +56,22 @@
                     <div v-for="room in rooms" :key="room.id">
                       <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
                     </div>
+                    <div v-for="user in allUser" :key="user.id">
+                      <RouterLink :to="'/chatPrivate/' + user.id" >
+                        <q-avatar>
+                          <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                        </q-avatar>
+                        <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
+                      </RouterLink>
+                    </div>
+                    <!-- <div v-for="user in userActive" :key="user.id">
+                      <RouterLink :to="'/chatPrivate/' + user.id" >
+                        <q-avatar>
+                          <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                        </q-avatar>
+                        <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
+                      </RouterLink>
+                    </div> -->
                 </nav>
               </q-scroll-area>
           </q-page>
@@ -80,11 +96,13 @@
   
 <script>
 import axios from 'axios'
+import * as signalR from "@aspnet/signalr";
 import { RouterLink } from 'vue-router'
   export default {
     name: 'HeaderComponent',
     data() {
       return {
+        connection: null,
         user:{
           name: '',
           avatar: 'https://cdn.quasar.dev/img/avatar5.jpg',
@@ -94,14 +112,42 @@ import { RouterLink } from 'vue-router'
         dialog: false,
         backdropFilter: '',
         rooms: [],
+        allUser:[],
+        userActive: [],
+        // active: false,
       }
+    }, 
+    created() {
+    this.initSignalRConnection();
     },
     mounted() {
       this.getUser();
       var userId = this.user.id;
       this.getRooms(userId);
+      this.getAllUsers();
     },
     methods: {
+      initSignalRConnection() {
+      this.connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7014/chatHub")
+        .build();
+
+      this.connection.start().then(() => {
+        console.log("Connected to SignalR Hub");
+        this.checkUserActive();
+        this.listenForUserActive();
+        // this.listenForNewRoom();
+      }).catch((error) => {
+        console.error("Error connecting to SignalR Hub: ", error);
+      });
+    },
+    listenForNewRoom() {
+      this.connection.on("addChatRoom", (newRoom) => {
+        this.rooms.push( newRoom );
+        console.log(newRoom);
+        // this.scrollToBottom();
+      });
+    },
       logout() {
         localStorage.clear();
         this.$router.push('/');
@@ -120,6 +166,25 @@ import { RouterLink } from 'vue-router'
           this.dialog = false;
           this.$router.go();
         })
+      },
+      getAllUsers() {
+        axios.get('https://localhost:7014/api/Users')
+        .then(res => {
+          this.allUser = res.data;
+          console.log(this.allUser);
+        })
+      },
+      checkUserActive() {
+        this.connection.invoke("GetUserActive")
+        .catch((error) => {
+          console.error("Error getting chat history: ", error);
+        });
+      },
+      listenForUserActive() {
+        this.connection.on("ReceiveUserActive", (users) => {
+          this.userActive = users;
+          console.log(users);
+        });
       },
       getRooms(userId) {
         axios.get(`https://localhost:7014/api/Rooms?userId=${userId}`)
