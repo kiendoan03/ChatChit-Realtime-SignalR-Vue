@@ -123,7 +123,7 @@ export default {
       });
     },
     listenForMessages() {
-      this.connection.on("ReceiveMessage", (message) => {
+      this.connection.on("ReceiveMessageRoom", (message) => {
         this.messages.push( {sender:message.fromUser,content:message.content} );
         console.log(message);
         this.scrollToBottom();
