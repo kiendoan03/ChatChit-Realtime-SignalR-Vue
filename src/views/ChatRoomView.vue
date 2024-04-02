@@ -71,6 +71,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 
 <script>
 import axios from 'axios';
+import * as signalR from "@aspnet/signalr";
     export default {
         name: 'ChatRoomView',
         data() {
@@ -87,6 +88,9 @@ import axios from 'axios';
                 selectedUsers: [], 
             }
         },
+        created() {
+          this.initSignalRConnection();
+        },
         mounted() {
         this.getRoom(this.$route.params.id);
         this.getUsers(this.$route.params.id);  
@@ -98,6 +102,20 @@ import axios from 'axios';
             }
         },
         methods:{
+          initSignalRConnection() {
+            this.connection = new signalR.HubConnectionBuilder()
+              .withUrl("https://localhost:7014/chatHub")
+              .build();
+
+            this.connection.start().then(() => {
+              console.log("Connected to SignalR Hub");
+              // this.listenForMessages();
+              // this.getHistoryChatRoom( this.room.id);
+              // this.listenForHistoryChatRoom();
+            }).catch((error) => {
+              console.error("Error connecting to SignalR Hub: ", error);
+            });
+          },
             getRoom(roomId){
                 axios.get('https://localhost:7014/api/rooms/'+roomId)
                 .then(res => {
@@ -112,12 +130,14 @@ import axios from 'axios';
                 });
             },
             addUsersToGroup() {
-              // Thêm logic để thêm người dùng được chọn vào nhóm ở đây
               this.selectedUsers = this.users.filter(user => user.checked).map(user => user.id);
-              console.log(this.selectedUsers); // Hiển thị ID của người dùng được chọn
-              
-              // Reset các checkbox
+              console.log(this.selectedUsers); 
+              this.selectedUsers.forEach(user => {
+                this.connection.invoke("AddUserToRoom", this.room.id, user );
+              });
               this.users.forEach(user => user.checked = false);
+              this.dialog = false;
+              this.$forceUpdate();
             },
             openDialog(filter) {
                 if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi

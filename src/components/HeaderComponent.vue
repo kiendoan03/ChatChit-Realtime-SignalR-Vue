@@ -136,6 +136,7 @@ import { RouterLink } from 'vue-router'
         console.log("Connected to SignalR Hub");
         this.checkUserActive();
         this.listenForUserActive();
+        this.listenJoinNewRoom();
         // this.listenForNewRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
@@ -178,6 +179,15 @@ import { RouterLink } from 'vue-router'
         this.connection.invoke("GetUserActive")
         .catch((error) => {
           console.error("Error getting chat history: ", error);
+        });
+      },
+      listenJoinNewRoom(){
+        console.log('listenJoinNewRoom');
+        this.connection.on("JoinNewGroup", (room) => {
+          console.log(1123);
+          this.rooms.push(room);
+          this.$forceUpdate();
+          console.log(room);
         });
       },
       listenForUserActive() {
