@@ -41,7 +41,7 @@ library.add(fas)
   </div>
   <div class="q-pa-md row justify-center" >
     <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
-    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessageToRoom" style="width: 100%;"  label="Type your message" :dense="dense">
+    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessageToRoom(this.room.id )" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar>
             <img src="https://cdn.quasar.dev/img/avatar5.jpg">
@@ -55,7 +55,7 @@ library.add(fas)
         </template>
 
         <template v-slot:after>
-          <div round dense flat @click="sendMessageToRoom" class="cursor-pointer">
+          <div round dense flat @click="sendMessageToRoom(this.room.id )" class="cursor-pointer">
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
           </div>
         </template>
@@ -83,12 +83,14 @@ export default {
         roomName: '',
         admin: '',
       },
-      now: Date.now()
+      now: Date.now(),
+      initSignalR : false
     };
    
   },
   created() {
     this.initSignalRConnection();
+    // this.initSignalR = false;
   },
   mounted() {
     this.getUser();
@@ -96,8 +98,16 @@ export default {
     // this.getHistoryChatRoom(this.$route.params.id);
   },
   watch: {
+    //van loi vl
             '$route.params.id': function(newId) {
-                this.getHistoryChatRoom(newId);
+                this.room.id = newId; 
+                this.initSignalR = true;
+                // this.listenForMessages(newId);
+                this.initSignalRConnection();
+                this.listenForMessages(newId);
+                // this.getHistoryChatRoom(newId);
+                this.sendMessageToRoom(newId);
+                // this.listenForMessages(newId);
                 this.messages = [];
             }
         },
@@ -115,25 +125,27 @@ export default {
 
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
-        this.listenForMessages();
-        this.getHistoryChatRoom( this.room.id);
+        if(this.initSignalR == 0){
+          this.listenForMessages(this.$route.params.id);
+        }
+        this.getHistoryChatRoom(this.room.id);
         this.listenForHistoryChatRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
-    listenForMessages() {
-      this.connection.on("ReceiveMessageRoom", (message) => {
+    listenForMessages(roomId) {
+      this.connection.on("ReceiveMessageRoom" + roomId, (message) => {
         this.messages.push( {sender:message.fromUser,content:message.content} );
         console.log(message);
         this.scrollToBottom();
       });
     },
-    sendMessageToRoom() {
+    sendMessageToRoom(roomId) {
         try {
             if (this.text.trim() !== "") {
                 console.log("Sending message to room...");
-                this.connection.invoke("SendToRoom", this.userId,this.room.id, this.text)
+                this.connection.invoke("SendToRoom", this.userId,roomId, this.text)
                     .then(() => {
                         console.log("Message sent successfully");
                         this.text = ""; // Clear input field after sending message

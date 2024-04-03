@@ -52,7 +52,7 @@
           <q-page class="q-pa-md">
               <q-scroll-area style="height: 38vmax; max-width: 30vmax;">
                 <nav class="route ">
-                    <RouterLink to="/"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
+                    <RouterLink to="/chatLobby"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
                     <div v-for="room in rooms" :key="room.id">
                       <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
                     </div>
@@ -136,7 +136,8 @@ import { RouterLink } from 'vue-router'
         console.log("Connected to SignalR Hub");
         this.checkUserActive();
         this.listenForUserActive();
-        this.listenJoinNewRoom();
+        // this.listenJoinNewRoom(this.user.id);
+        console.log(this.user.id);
         // this.listenForNewRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
@@ -169,7 +170,7 @@ import { RouterLink } from 'vue-router'
         })
       },
       getAllUsers() {
-        axios.get('https://localhost:7014/api/Users')
+        axios.get('https://localhost:7014/api/Users/GetUserExceptMe?userId=' + this.user.id )
         .then(res => {
           this.allUser = res.data;
           console.log(this.allUser);
@@ -178,18 +179,18 @@ import { RouterLink } from 'vue-router'
       checkUserActive() {
         this.connection.invoke("GetUserActive")
         .catch((error) => {
-          console.error("Error getting chat history: ", error);
+          console.error("Error getting user active: ", error);
         });
       },
-      listenJoinNewRoom(){
-        console.log('listenJoinNewRoom');
-        this.connection.on("JoinNewGroup", (room) => {
-          console.log(1123);
-          this.rooms.push(room);
-          this.$forceUpdate();
-          console.log(room);
-        });
-      },
+      // listenJoinNewRoom(userId){
+      //   console.log('listenJoinNewRoom');
+      //   console.log(userId);
+      //   this.connection.on("JoinNewGroup" + userId, (room) => {
+      //     this.rooms.push(room);
+      //     console.log(room);
+      //     this.$forceUpdate();
+      //   });
+      // },
       listenForUserActive() {
         this.connection.on("ReceiveUserActive", (users) => {
           this.userActive = users;

@@ -20,7 +20,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
             </q-toolbar-title>
             <q-space />
             <div class="cursor-pointer" >
-                <font-awesome-icon :icon="['fas', 'user-plus']" style="color: black;" size="lg"  @click="openDialog('blur(4px) saturate(150%)')"/>
+                <font-awesome-icon :icon="['fas', 'user-plus']" style="color: black; margin-right: 1vmax;" size="lg"  @click="openDialog('blur(4px) saturate(150%)')"/>
+                <font-awesome-icon :icon="['fas', 'person-through-window']" style="color: black;" size="xl" @click="leaveRoom"/>
             </div>
             <div class="q-pa-md q-gutter-sm ">
                     <q-dialog v-model="dialog" :backdrop-filter="backdropFilter">
@@ -109,9 +110,6 @@ import * as signalR from "@aspnet/signalr";
 
             this.connection.start().then(() => {
               console.log("Connected to SignalR Hub");
-              // this.listenForMessages();
-              // this.getHistoryChatRoom( this.room.id);
-              // this.listenForHistoryChatRoom();
             }).catch((error) => {
               console.error("Error connecting to SignalR Hub: ", error);
             });
@@ -138,6 +136,14 @@ import * as signalR from "@aspnet/signalr";
               this.users.forEach(user => user.checked = false);
               this.dialog = false;
               this.$forceUpdate();
+            },
+            leaveRoom() {
+              this.connection.invoke("LeaveRoom", this.room.id, localStorage.getItem('userId'))
+              .catch(err => console.error(err));
+              this.$router.push('/');
+              // this.$forceUpdate();
+              // this.$router.go();
+             
             },
             openDialog(filter) {
                 if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi

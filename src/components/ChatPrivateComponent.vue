@@ -12,7 +12,7 @@ library.add(fas)
 </script>
 
 <template >
-  <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:36.69vmax;"  >
+  <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
     <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         :name="[message.sender]"
@@ -29,12 +29,19 @@ library.add(fas)
         :text="[message.content]"
         stamp="4 minutes ago" 
       />
+      <!-- <q-chat-message
+        name="Jane"
+        avatar="https://cdn.quasar.dev/img/avatar5.jpg"
+        bg-color="primary"
+      >
+        <q-spinner-dots size="2rem" />
+      </q-chat-message> -->
       <!-- -->
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
     <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
-    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessage" style="width: 100%;"  label="Type your message" :dense="dense">
+    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessagePrivate" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar>
             <img src="https://cdn.quasar.dev/img/avatar5.jpg">
@@ -48,7 +55,7 @@ library.add(fas)
         </template>
 
         <template v-slot:after>
-          <div round dense flat @click="sendMessage" class="cursor-pointer">
+          <div round dense flat @click="sendMessagePrivate" class="cursor-pointer">
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
           </div>
         </template>
@@ -63,7 +70,7 @@ library.add(fas)
   import * as signalR from "@aspnet/signalr";
 
 export default {
-    name: 'ChatLobbyComponent',
+    name: 'ChatPrivateComponent',
   data() {
     return {
       connection: null,
@@ -80,7 +87,15 @@ export default {
   },
   mounted() {
     this.getUser();
+    // this.room.id = this.$route.params.id;
+    // this.getHistoryChatPrivate(this.userId, this.$route.params.id);
   },
+  watch: {
+            '$route.params.id': function(newId) {
+                this.getHistoryChatPrivate(this.userId, newId);
+                this.messages = [];
+            },
+        },
   methods: {
     scrollToBottom() {
       this.$nextTick(() => {
@@ -96,48 +111,60 @@ export default {
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
         this.listenForMessages();
-        this.getHistory();
-        this.listenForChatHistory();
+        this.listenForReceive(this.userId);
+        this.getHistoryChatPrivate(this.userId, this.$route.params.id);
+        this.listenForHistoryChatPrivate();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
-    getHistory() {
-      this.connection.invoke("GetChatHistoryLobby")
-      .catch((error) => {
-        console.error("Error getting chat history: ", error);
-      });
-    },
-    listenForChatHistory() {
-      this.connection.on("ReceiveChatHistoryLobby", (messages) => {
-        // Cập nhật dữ liệu lịch sử chat
-        console.log(messages);
-        messages.forEach(message => {
-          this.messages.push( {sender:message.fromUser,content:message.content, id: message.id} );
-        });
-        this.scrollToBottom();
-      }); 
-    },
     listenForMessages() {
-      // this.connection.on("ReceiveMessage", (sender, content) => {
-      //   this.messages.push( {sender,content} );
-      // });
-      this.connection.on("ReceiveMessage", (message) => {
+      this.connection.on("ReceiveMessagePrivate", (message) => {
         this.messages.push( {sender:message.fromUser,content:message.content} );
+        console.log(message);
         this.scrollToBottom();
       });
     },
-    sendMessage() {
-      if (this.text.trim() !== "") {
-        this.connection.invoke("SendMessage", this.userId, this.text)
-          .then(() => {
-            console.log("Message sent successfully");
-            this.text = ""; // Clear input field after sending message
-          })
-          .catch((error) => {
+    listenForReceive(receiveId){
+        this.connection.on("ReceiveMessagePrivate" + receiveId, (message) => {
+            this.messages.push( {sender:message.fromUser,content:message.content} );
+            console.log(message);
+            this.scrollToBottom();
+        });
+    },
+    sendMessagePrivate() {
+        try {
+            if (this.text.trim() !== "") {
+                console.log("Sending message to room...");
+                this.connection.invoke("SendPrivate", this.userId,this.$route.params.id, this.text)
+                    .then(() => {
+                        console.log("Message sent successfully");
+                        this.text = ""; // Clear input field after sending message
+                    })
+                    .catch((error) => {
+                        console.error("Error sending message: ", error);
+                        // Xử lý lỗi ở đây
+                    });
+            }
+        } catch (error) {
             console.error("Error sending message: ", error);
-          });
-      }
+            // Xử lý lỗi ở đây
+        }
+    },
+    getHistoryChatPrivate(senderId, receiveId){
+        this.connection.invoke("GetHistoryChatPrivate", senderId, receiveId)
+        .catch((error) => {
+            console.error("Error getting chat history: ", error);
+        });
+    },
+    listenForHistoryChatPrivate(){
+        this.connection.on("ReceiveChatHistoryPrivate", (messages) => {
+            // Cập nhật dữ liệu lịch sử chat
+            messages.forEach(message => {
+                this.messages.push( {sender:message.fromUser,content:message.content} );
+            });
+            this.scrollToBottom();
+        }); 
     },
     getUser() {
       if (localStorage.getItem('token')){
@@ -152,5 +179,5 @@ export default {
 </script>
 
 <style scoped>
-  
+
 </style>
