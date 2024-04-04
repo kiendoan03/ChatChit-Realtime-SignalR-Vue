@@ -80,7 +80,7 @@
                     <div v-for="room in rooms" :key="room.id">
                       <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
                     </div>
-                    <div v-for="user in allUser" :key="user.id">
+                    <div v-for="user in allUser" >
                       <RouterLink :to="'/chatPrivate/' + user.id" >
                         <q-avatar>
                           <img src="https://cdn.quasar.dev/img/avatar5.jpg">
@@ -149,7 +149,7 @@ import { RouterLink } from 'vue-router'
       this.getUser();
       var userId = this.user.id;
       this.getRooms(userId);
-      this.getAllUsers();
+      this.getAllUsers(userId);
     },
     methods: {
       initSignalRConnection() {
@@ -159,8 +159,10 @@ import { RouterLink } from 'vue-router'
 
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
-        this.checkUserActive();
-        this.listenForUserActive();
+        // this.checkUserActive();
+        // this.listenForUserActive();
+        // this.getAllUsers(this.user.id);
+        this.listenForUsers();
         this.listenJoinNewRoom(this.user.id);
         console.log(this.user.id);
         this.listonForLeaveRoom(this.user.id);
@@ -195,12 +197,22 @@ import { RouterLink } from 'vue-router'
           this.$router.go();
         })
       },
-      getAllUsers() {
-        axios.get('https://localhost:7014/api/Users/GetUserExceptMe?userId=' + this.user.id )
+      getAllUsers(userId) {
+        axios.get('https://localhost:7014/api/Users/GetUserExceptMe?userId=' + userId)
         .then(res => {
           this.allUser = res.data;
           console.log(this.allUser);
         })
+        // this.connection.invoke("GetUserExceptMe", userId)
+        // .catch((error) => {
+        //   console.error("Error getting all user: ", error);
+        // });
+      },
+      listenForUsers(){
+        this.connection.on("newUser", (users) => {
+          this.allUser.push(users);
+          console.log(this.allUser);
+        });
       },
       checkUserActive() {
         this.connection.invoke("GetUserActive")
