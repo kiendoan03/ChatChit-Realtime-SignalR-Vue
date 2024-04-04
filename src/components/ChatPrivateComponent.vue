@@ -19,7 +19,7 @@ library.add(fas)
         avatar="https://cdn.quasar.dev/img/avatar4.jpg"
         :text="[message.content]"
         sent
-        stamp="7 minutes ago"
+        :stamp="[message.sendAt]"
         v-if="message.sender === this.user"
       />
        <!--  -->
@@ -27,7 +27,7 @@ library.add(fas)
         :name="[message.sender]"
         avatar="https://cdn.quasar.dev/img/avatar3.jpg"
         :text="[message.content]"
-        stamp="4 minutes ago" 
+        :stamp="[message.sendAt]" 
       />
       <!-- <q-chat-message
         name="Jane"
@@ -161,10 +161,33 @@ export default {
         this.connection.on("ReceiveChatHistoryPrivate", (messages) => {
             // Cập nhật dữ liệu lịch sử chat
             messages.forEach(message => {
-                this.messages.push( {sender:message.fromUser,content:message.content} );
+                const elapsedTime = this.calculateElapsedTime(message.sendAt);
+                this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime});
             });
             this.scrollToBottom();
         }); 
+    },
+    calculateElapsedTime(sentAt) {
+      const now = new Date(); // Thời gian hiện tại
+      const sentTime = new Date(sentAt); // Thời gian gửi tin nhắn
+      const elapsed = now - sentTime; // Thời gian trôi qua (đơn vị: mili giây)
+
+      // Chuyển đổi thời gian trôi qua thành đơn vị phù hợp (ví dụ: phút, giờ, ngày)
+      const minutesElapsed = Math.floor(elapsed / 60000); // 60000 mili giây = 1 phút
+      const hoursElapsed = Math.floor(elapsed / 3600000); // 3600000 mili giây = 1 giờ
+      const daysElapsed = Math.floor(elapsed / 86400000); // 86400000 mili giây = 1 ngày
+      const yearsElapsed = Math.floor(elapsed / 31536000000); // 31536000000 mili giây = 1 năm
+
+      // Trả về thời gian trôi qua dưới dạng chuỗi để hiển thị cho người dùng
+      if (yearsElapsed > 0) {
+          return `${yearsElapsed} years ago`;
+      } else if (daysElapsed > 0) {
+          return `${daysElapsed} days ago`;
+      } else if (hoursElapsed > 0) {
+          return `${hoursElapsed} hours ago`;
+      } else {
+          return `${minutesElapsed} minutes ago`;
+      }
     },
     getUser() {
       if (localStorage.getItem('token')){
