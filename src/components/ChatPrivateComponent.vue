@@ -13,30 +13,31 @@ library.add(fas)
 
 <template >
   <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
-    <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
+    <div v-for="message in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
-        :text="[message.content]"
         sent
         :stamp="[message.sendAt]"
         v-if="message.sender === this.user"
-      />
+      >
+        <div>
+          {{ message.content }}
+          <!-- <img src="" alt=""> -->
+        </div>
+        <!-- <div> neu tin nhắn liên tiếp nhau cùng thuộc 1 người thì cho hiện hết ở đây</div> -->
+      </q-chat-message>
        <!--  -->
       <q-chat-message v-else
         :name="[message.sender]"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
-        :text="[message.content]"
         :stamp="[message.sendAt]" 
-      />
-      <!-- <q-chat-message
-        name="Jane"
-        avatar="https://cdn.quasar.dev/img/avatar5.jpg"
-        bg-color="primary"
       >
-        <q-spinner-dots size="2rem" />
-      </q-chat-message> -->
-      <!-- -->
+        <div>
+          {{ message.content }}
+          <!-- <img src="" alt=""> -->
+        </div>
+      </q-chat-message>
     </div>
   </div>
   <div class="q-pa-md row justify-center" >

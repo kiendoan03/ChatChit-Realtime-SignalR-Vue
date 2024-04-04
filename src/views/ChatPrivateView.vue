@@ -18,8 +18,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
               </q-avatar>
             <q-toolbar-title>
               <strong class="text-dark">{{this.user.displayName}}</strong>
-              <!-- <img class="emoji" src="https://localhost:7014/images/emojis/emoji1.png"> -->
-              <!-- <img src="https://localhost:7071/uploads/images/casts/8059c54f-bd2d-448a-be9e-346f1726b190_50%20cents.png" alt=""> -->
             </q-toolbar-title>
             <q-space />
       
