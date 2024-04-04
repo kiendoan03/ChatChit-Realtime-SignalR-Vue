@@ -85,30 +85,31 @@ export default {
       },
       now: Date.now(),
       // initSignalR : false
+      // isListeningForMessages: false,
     };
    
   },
   created() {
-    this.initSignalRConnection();
-    // this.initSignalR = false;
+    this.initSignalRConnection(this.$route.params.id);
   },
   mounted() {
     this.getUser();
     this.room.id = this.$route.params.id;
-    // this.getHistoryChatRoom(this.$route.params.id);
   },
   watch: {
     //van loi vl
-            '$route.params.id': function(newId) {
+            '$route.params.id': function(newId, oldId ) {
+              if (newId !== oldId){
+                this.room.id ='';
                 this.room.id = newId; 
-                // this.initSignalR = true;
-                // this.listenForMessages(newId);
-                this.initSignalRConnection();
-                this.listenForMessages(newId);
-                // this.getHistoryChatRoom(newId);
-                this.sendMessageToRoom(newId);
-                // this.listenForMessages(newId);
                 this.messages = [];
+                // if (this.isListeningForMessages) {
+                  this.disconnectSignalRConnection();
+                //   this.isListeningForMessages = false;
+                // }
+                this.initSignalRConnection(newId);
+                this.sendMessageToRoom(newId);
+              }
             }
         },
   methods: {
@@ -118,28 +119,50 @@ export default {
         container.scrollTop = container.scrollHeight;
       });
     },
-    initSignalRConnection() {
+    initSignalRConnection(roomId) {
+      this.disconnectSignalRConnection(); 
       this.connection = new signalR.HubConnectionBuilder()
         .withUrl("https://localhost:7014/chatHub")
         .build();
 
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
-        // if(this.initSignalR == 0){
-          this.listenForMessages(this.$route.params.id);
-        // }
-        this.getHistoryChatRoom(this.room.id);
+        this.listenForMessages(roomId);
+        this.getHistoryChatRoom(roomId);
         this.listenForHistoryChatRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
+    disconnectSignalRConnection() {
+      if (this.connection && this.connection.state && this.connection.state === signalR.HubConnectionState.Connected) {
+        console.log("Disconnecting from SignalR Hub");
+        this.connection.stop().then(() => {
+          console.log("Disconnected from SignalR Hub");
+        }).catch((error) => {
+          console.error("Error disconnecting from SignalR Hub: ", error);
+        });
+      } else {
+        console.log("SignalR connection is not established or already disconnected");
+      }
+    },
     listenForMessages(roomId) {
-      this.connection.on("ReceiveMessageRoom" + roomId, (message) => {
-        this.messages.push( {sender:message.fromUser,content:message.content} );
-        console.log(message);
-        this.scrollToBottom();
-      });
+      // if (!this.isListeningForMessages) {
+      //   this.isListeningForMessages = true;
+        if (this.connection) {
+          this.connection.off("ReceiveMessageRoom" + roomId);
+          this.connection.on("ReceiveMessageRoom" + roomId, (message) => {
+            if (this.room.id === roomId) {
+              // Kiểm tra xem tin nhắn đã tồn tại trong mảng hay chưa trước khi thêm vào
+              if (!this.messages.some(msg => msg.sender === message.fromUser && msg.content === message.content && msg.id === message.id)) {
+                this.messages.push({ sender: message.fromUser, content: message.content, id: message.id});
+                console.log(message);
+                this.scrollToBottom();
+              }
+            }
+          });
+        // }
+      }
     },
     sendMessageToRoom(roomId) {
         try {
