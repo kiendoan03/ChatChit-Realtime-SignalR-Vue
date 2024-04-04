@@ -83,7 +83,7 @@
                     <div v-for="user in allUser" >
                       <RouterLink :to="'/chatPrivate/' + user.id" >
                         <q-avatar>
-                          <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                          <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
                         </q-avatar>
                         <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
                       </RouterLink>
@@ -104,7 +104,7 @@
           <q-toolbar>
             <div class="user">
               <q-avatar>
-                <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
               </q-avatar>
               <span style="margin-left: 1.5vh;">{{ this.user.name }}</span>
             </div>
@@ -129,7 +129,7 @@ import { RouterLink } from 'vue-router'
         connection: null,
         user:{
           name: '',
-          avatar: 'https://cdn.quasar.dev/img/avatar5.jpg',
+          avatar: '',
           id: '',
         },
         roomName: '',

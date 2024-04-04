@@ -16,7 +16,7 @@ library.add(fas)
     <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
-        avatar="https://cdn.quasar.dev/img/avatar4.jpg"
+        avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :text="[message.content]"
         sent
         :stamp="[message.sendAt]"
@@ -25,7 +25,7 @@ library.add(fas)
        <!--  -->
       <q-chat-message v-else
         :name="[message.sender]"
-        avatar="https://cdn.quasar.dev/img/avatar3.jpg"
+        avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :text="[message.content]"
         :stamp="[message.sendAt]" 
       />
@@ -44,7 +44,7 @@ library.add(fas)
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessagePrivate" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar>
-            <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+            <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
           </q-avatar>
         </template>
 

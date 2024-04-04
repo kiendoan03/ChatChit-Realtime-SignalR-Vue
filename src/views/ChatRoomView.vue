@@ -14,7 +14,10 @@ import { library } from '@fortawesome/fontawesome-svg-core'
     <q-layout view="lHh lpr lFf" container style="height: 44.92vmax;" class="shadow-2 rounded-borders">
         <q-header elevated class="bg-transparent">
           <q-toolbar>
-            <img src="../assets/images/images-removebg-preview.png" style="width: 3%;" alt="">
+            <q-avatar>
+                <img src="https://static.vecteezy.com/system/resources/previews/026/019/617/original/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg">
+            </q-avatar>
+            <!-- <img src="https://static.vecteezy.com/system/resources/previews/026/019/617/original/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg" style="width: 3%;" alt=""> -->
             <q-toolbar-title>
               <strong class="text-dark">{{this.room.roomName}}</strong>
             </q-toolbar-title>
@@ -37,7 +40,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
                                 <q-checkbox v-model="user.checked"  :value="user.id" style="text-align: center;justify-content: center;">
                                  <q-item-section >
                                     <q-avatar>
-                                      <img src="https://cdn.quasar.dev/img/avatar5.jpg" >
+                                      <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg" >
                                     </q-avatar>
                                   </q-item-section>
                                   <!-- <q-item-section> -->

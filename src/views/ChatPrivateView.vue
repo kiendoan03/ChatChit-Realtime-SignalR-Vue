@@ -14,7 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
         <q-header elevated class="bg-transparent">
           <q-toolbar>
             <q-avatar>
-                <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
               </q-avatar>
             <q-toolbar-title>
               <strong class="text-dark">{{this.user.displayName}}</strong>
