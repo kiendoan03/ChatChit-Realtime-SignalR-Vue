@@ -97,7 +97,6 @@ export default {
     this.room.id = this.$route.params.id;
   },
   watch: {
-    //van loi vl
             '$route.params.id': function(newId, oldId ) {
               if (newId !== oldId){
                 this.room.id ='';
