@@ -43,7 +43,31 @@
                         </q-card-actions>
                       </q-card>
                     </q-dialog>
-                </div>
+              </div>
+              <!-- <div class="q-pa-md q-gutter-sm "> -->
+                    <q-dialog v-model="dialogSignOut" :backdrop-filter="backdropFilter">
+                      <q-card>
+                        <q-card-section class="row items-center q-pb-none text-h6 text-red">
+                          Sign out
+                        </q-card-section>
+
+                        <q-card-section class="text-dark" >
+                          <q-item-secion>
+                            <q-item-sec>
+                              <q-item-label>
+                                Are you sure you want to sign out?
+                              </q-item-label>
+                            </q-item-sec>
+                          </q-item-secion>
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                          <q-btn color="secondary" label="Yes" @click="logout" />
+                          <q-btn flat label="No" color="primary" v-close-popup />
+                        </q-card-actions>
+                      </q-card>
+                    </q-dialog>
+                <!-- </div> -->
             </div>
           </q-toolbar>
         </q-header>
@@ -85,7 +109,7 @@
               <span style="margin-left: 1.5vh;">{{ this.user.name }}</span>
             </div>
             <q-space />
-            <div class="cursor-pointer" @click="logout">
+            <div class="cursor-pointer"  @click="openDialogSignOut('blur(4px) saturate(150%)')">
               <font-awesome-icon :icon="['fas', 'right-from-bracket']" size="xl" />
             </div>
           </q-toolbar>
@@ -110,6 +134,7 @@ import { RouterLink } from 'vue-router'
         },
         roomName: '',
         dialog: false,
+        dialogSignOut: false,
         backdropFilter: '',
         rooms: [],
         allUser:[],
@@ -223,7 +248,15 @@ import { RouterLink } from 'vue-router'
         } else {
           console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
         }
-      }
+      },
+      openDialogSignOut(filter) {
+        if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+          this.backdropFilter = filter;
+          this.dialogSignOut = true;
+        } else {
+          console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+        }
+      },
     }
   }         
 </script>

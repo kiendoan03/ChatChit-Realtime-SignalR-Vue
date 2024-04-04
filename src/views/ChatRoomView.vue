@@ -21,7 +21,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
             <q-space />
             <div class="cursor-pointer" >
                 <font-awesome-icon :icon="['fas', 'user-plus']" style="color: black; margin-right: 1vmax;" size="lg"  @click="openDialog('blur(4px) saturate(150%)')"/>
-                <font-awesome-icon :icon="['fas', 'person-through-window']" style="color: black;" size="xl" @click="leaveRoom"/>
+                <font-awesome-icon :icon="['fas', 'person-through-window']" style="color: black;" size="xl" @click="openDialogOut('blur(4px) saturate(150%)')"/>
             </div>
             <div class="q-pa-md q-gutter-sm ">
                     <q-dialog v-model="dialog" :backdrop-filter="backdropFilter">
@@ -57,6 +57,28 @@ import { library } from '@fortawesome/fontawesome-svg-core'
                       </q-card>
                     </q-dialog>
                 </div>
+                <div class="q-pa-md q-gutter-sm ">
+                    <q-dialog v-model="dialogOut" :backdrop-filter="backdropFilter">
+                      <q-card>
+                        <q-card-section class="row items-center q-pb-none text-h6 text-red">
+                          Leave Group
+                        </q-card-section>
+
+                        <q-card-section class="text-dark" >
+                          <q-item-secion>
+                            <q-item-sec>
+                              <q-item-label>Are you sure you want to leave this group?</q-item-label>
+                            </q-item-sec>
+                          </q-item-secion>
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                          <q-btn color="secondary" label="Yes" @click="leaveRoom" />
+                          <q-btn flat label="No" color="primary" v-close-popup />
+                        </q-card-actions>
+                      </q-card>
+                    </q-dialog>
+                </div>
           </q-toolbar>
         </q-header>
         <q-page-container>
@@ -84,6 +106,7 @@ import * as signalR from "@aspnet/signalr";
                     admin: '',
                 },
                 dialog: false,
+                dialogOut: false,
                 backdropFilter: '', 
                 users: [],
                 selectedUsers: [], 
@@ -149,6 +172,14 @@ import * as signalR from "@aspnet/signalr";
                 if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
                 this.backdropFilter = filter;
                 this.dialog = true;
+                } else {
+                console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+                }
+            },
+            openDialogOut(filter) {
+                if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+                this.backdropFilter = filter;
+                this.dialogOut = true;
                 } else {
                 console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
                 }
