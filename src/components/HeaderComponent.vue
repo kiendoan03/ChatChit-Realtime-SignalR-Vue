@@ -136,8 +136,9 @@ import { RouterLink } from 'vue-router'
         console.log("Connected to SignalR Hub");
         this.checkUserActive();
         this.listenForUserActive();
-        // this.listenJoinNewRoom(this.user.id);
+        this.listenJoinNewRoom(this.user.id);
         console.log(this.user.id);
+        this.listonForLeaveRoom(this.user.id);
         // this.listenForNewRoom();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
@@ -182,15 +183,26 @@ import { RouterLink } from 'vue-router'
           console.error("Error getting user active: ", error);
         });
       },
-      // listenJoinNewRoom(userId){
-      //   console.log('listenJoinNewRoom');
-      //   console.log(userId);
-      //   this.connection.on("JoinNewGroup" + userId, (room) => {
-      //     this.rooms.push(room);
-      //     console.log(room);
-      //     this.$forceUpdate();
-      //   });
-      // },
+      listenJoinNewRoom(userId){
+        console.log('listenJoinNewRoom');
+        console.log(userId);
+        this.connection.on("JoinNewGroup" + userId, (room) => {
+          this.rooms.push(room);
+          console.log(room);
+          this.$forceUpdate();
+        });
+      },
+      listonForLeaveRoom(userId){
+        this.connection.on("LeaveGroup" + userId, (room) => {
+          this.rooms = this.rooms.filter(rooms => rooms.id !== room.id);
+          // const index = this.rooms.findIndex(rooms => rooms.id === room.id);
+          //   if (index !== -1) {
+          //       this.rooms.splice(index, 1);
+          //   }
+          console.log(room);
+          this.$forceUpdate();
+        });
+      },
       listenForUserActive() {
         this.connection.on("ReceiveUserActive", (users) => {
           this.userActive = users;

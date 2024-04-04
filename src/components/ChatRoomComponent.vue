@@ -84,7 +84,7 @@ export default {
         admin: '',
       },
       now: Date.now(),
-      initSignalR : false
+      // initSignalR : false
     };
    
   },
@@ -101,7 +101,7 @@ export default {
     //van loi vl
             '$route.params.id': function(newId) {
                 this.room.id = newId; 
-                this.initSignalR = true;
+                // this.initSignalR = true;
                 // this.listenForMessages(newId);
                 this.initSignalRConnection();
                 this.listenForMessages(newId);
@@ -125,9 +125,9 @@ export default {
 
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
-        if(this.initSignalR == 0){
+        // if(this.initSignalR == 0){
           this.listenForMessages(this.$route.params.id);
-        }
+        // }
         this.getHistoryChatRoom(this.room.id);
         this.listenForHistoryChatRoom();
       }).catch((error) => {
