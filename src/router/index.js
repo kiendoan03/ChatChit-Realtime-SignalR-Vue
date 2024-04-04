@@ -20,8 +20,7 @@ const router = createRouter({
             path: '/chatPrivate/:id',
             name: 'chatPrivate',
             component: ChatPrivateView
-        }
-
+        },
     ]
 })
 
