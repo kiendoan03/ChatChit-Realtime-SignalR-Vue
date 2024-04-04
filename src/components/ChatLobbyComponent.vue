@@ -125,6 +125,7 @@ export default {
       const elapsed = now - sentTime; // Thời gian trôi qua (đơn vị: mili giây)
 
       // Chuyển đổi thời gian trôi qua thành đơn vị phù hợp (ví dụ: phút, giờ, ngày)
+      const secondsElapsed = Math.floor(elapsed / 1000); // 1000 mili giây = 1 giây
       const minutesElapsed = Math.floor(elapsed / 60000); // 60000 mili giây = 1 phút
       const hoursElapsed = Math.floor(elapsed / 3600000); // 3600000 mili giây = 1 giờ
       const daysElapsed = Math.floor(elapsed / 86400000); // 86400000 mili giây = 1 ngày
@@ -137,16 +138,25 @@ export default {
           return `${daysElapsed} days ago`;
       } else if (hoursElapsed > 0) {
           return `${hoursElapsed} hours ago`;
-      } else {
+      } else if (minutesElapsed > 0){
           return `${minutesElapsed} minutes ago`;
-      }
+      } else if (secondsElapsed == 0){
+          return `Just now`;
+      } else if (secondsElapsed == 1){
+          return `${secondsElapsed} second ago`;
+      } else if (secondsElapsed > 1){
+          return `${secondsElapsed} seconds ago`;
+      } else {
+          return `${secondsElapsed} seconds ago`;
+      } 
     },
     listenForMessages() {
       // this.connection.on("ReceiveMessage", (sender, content) => {
       //   this.messages.push( {sender,content} );
       // });
       this.connection.on("ReceiveMessage", (message) => {
-        this.messages.push( {sender:message.fromUser,content:message.content} );
+        const elapsedTime = this.calculateElapsedTime(message.sendAt);
+        this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
         this.scrollToBottom();
       });
     },
