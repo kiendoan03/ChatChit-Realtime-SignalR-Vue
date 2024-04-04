@@ -15,7 +15,7 @@ library.add(fas)
   <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
     <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
-        :name="[message.sender]"
+        name="Me"
         avatar="https://cdn.quasar.dev/img/avatar4.jpg"
         :text="[message.content]"
         sent
