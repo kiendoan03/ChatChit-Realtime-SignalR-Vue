@@ -13,11 +13,12 @@ library.add(fas)
 
 <template >
   <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:36.69vmax;"  >
-    <div class="" v-for="message in messages" :key="message.id" style="width: 100%;">
+    <div  v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :text="[message.content]"
+        :size="messageSize[index]"
         sent
         :stamp="[message.sendAt]"
         v-if="message.sender === this.user"
@@ -27,6 +28,7 @@ library.add(fas)
         :name="[message.sender]"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :text="[message.content]"
+        :size="messageSize[index]"
         :stamp="[message.sendAt]" 
       />
       <!-- -->
@@ -71,7 +73,8 @@ export default {
       text: "",
       user: "",
       userId: "",
-      now: Date.now()
+      // now: Date.now(),
+      messageSize: [], 
     };
    
   },
@@ -80,6 +83,7 @@ export default {
   },
   mounted() {
     this.getUser();
+    
   },
   methods: {
     scrollToBottom() {
@@ -116,6 +120,7 @@ export default {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
           this.messages.push( {sender:message.fromUser,content:message.content, id: message.id, sendAt: elapsedTime} );
         });
+        this.calculateMessageSize();
         this.scrollToBottom();
       }); 
     },
@@ -150,6 +155,22 @@ export default {
           return `${secondsElapsed} seconds ago`;
       } 
     },
+    calculateMessageSize() {
+      this.messages.forEach(message => {
+        const messageLength = message.content.length;
+        console.log(1);
+        console.log(messageLength);
+        let size = 1;
+        if (messageLength < 50) {
+          size = 1; // Small size
+        } else if (messageLength < 100) {
+          size = 2; // Medium size
+        } else {
+          size = 4; // Large size
+        }
+        this.messageSize.push(size); // Push integer size value
+      });
+    },
     listenForMessages() {
       // this.connection.on("ReceiveMessage", (sender, content) => {
       //   this.messages.push( {sender,content} );
@@ -159,6 +180,7 @@ export default {
         this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
         this.scrollToBottom();
       });
+      this.calculateMessageSize();
     },
     sendMessage() {
       if (this.text.trim() !== "") {
@@ -185,5 +207,5 @@ export default {
 </script>
 
 <style scoped>
-  
+
 </style>
