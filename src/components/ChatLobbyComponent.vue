@@ -25,7 +25,7 @@ library.add(fas)
       <div>
         <span v-for="(element, index) in message.content">
           <span v-if="typeof element === 'string'">{{ element }}</span>
-          <img v-else-if="element.type === 'image'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+          <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
         </span>
       </div>
       
@@ -41,7 +41,7 @@ library.add(fas)
         <div>
           <span v-for="(element, index) in message.content">
             <span v-if="typeof element === 'string'">{{ element }}</span>
-            <img v-else-if="element.type === 'image'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+            <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
           </span>
         </div>
       </q-chat-message>
@@ -97,7 +97,6 @@ export default {
   },
   mounted() {
     this.getUser();
-    
   },
   methods: {
     scrollToBottom() {
@@ -145,7 +144,7 @@ export default {
               messageElements.push(messageContent.substring(lastIndex, match.index));
             }
             // Thêm hình ảnh
-            messageElements.push({ type: 'image', src: match[1] });
+            messageElements.push({ type: 'emoji', src: match[1] });
             lastIndex = imageRegex.lastIndex;
           }
 
@@ -163,7 +162,6 @@ export default {
           });
         });
 
-        // Sau khi thêm tin nhắn vào messages, tính toán kích thước của mỗi tin nhắn
         this.calculateMessageSize();
         this.scrollToBottom();
       });
@@ -201,53 +199,56 @@ export default {
     },
     calculateMessageSize() {
       this.messages.forEach(message => {
-        const messageLength = message.content.length;
-        console.log(message.content);
-        console.log(messageLength);
-        let size = 1;
-        if (messageLength < 50) {
-          size = 2; // Small size
-        } else if (messageLength < 100) {
-          size = 3; // Medium size
-        } else {
-          size = 5; // Large size
-        }
-        this.messageSize.push(size); // Push integer size value
-        console.log(this.messageSize);
+        let size = 1; 
+        message.content.forEach(item => {
+          if (typeof item === 'string') {
+            const itemLength = item.length;
+            if (itemLength < 50) {
+              size = 1.5; 
+            } else if (itemLength < 100) {
+              size = 3; 
+            } else {
+              size = 5; 
+            }
+          } else if (item && item.type === 'emoji') {
+              size = 1.5;
+          }
+        });
+        // Thêm kích thước vào mảng messageSize
+        this.messageSize.push(size);
       });
     },
+     //còn lỗi chỉnh kích thước tin nhắn phần gửi đi này!!!!!
     listenForMessages() {
       this.connection.on("ReceiveMessage", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
         let messageContent = message.content;
 
-        // Tạo một mảng để chứa các phần tử của tin nhắn (văn bản và hình ảnh)
-        const messageElements = [];
+          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-        // Kiểm tra nếu tin nhắn chứa hình ảnh
-        const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-        let match;
-        let lastIndex = 0;
+          // Kiểm tra nếu tin nhắn chứa hình ảnh
+          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          let match;
+          let lastIndex = 0;
 
-        while ((match = imageRegex.exec(messageContent)) !== null) {
-          // Thêm văn bản trước hình ảnh (nếu có)
-          if (match.index > lastIndex) {
-            messageElements.push(messageContent.substring(lastIndex, match.index));
+          while ((match = imageRegex.exec(messageContent)) !== null) {
+            // Thêm văn bản trước hình ảnh (nếu có)
+            if (match.index > lastIndex) {
+              messageElements.push(messageContent.substring(lastIndex, match.index));
+            }
+            // Thêm hình ảnh
+            messageElements.push({ type: 'emoji', src: match[1] });
+            lastIndex = imageRegex.lastIndex;
           }
-          // Thêm hình ảnh
-          messageElements.push({ type: 'image', src: match[1] });
-          lastIndex = imageRegex.lastIndex;
-        }
-
-        // Thêm văn bản cuối cùng (nếu có)
-        if (lastIndex < messageContent.length) {
-          messageElements.push(messageContent.substring(lastIndex));
-        }
+          // Thêm văn bản cuối cùng (nếu có)
+          if (lastIndex < messageContent.length) {
+            messageElements.push(messageContent.substring(lastIndex));
+          }
           
         this.messages.push( {sender: message.fromUser, content: messageElements, sendAt: elapsedTime} );
         this.scrollToBottom();
+        this.calculateMessageSize();
       });
-      this.calculateMessageSize();
     },
     sendMessage() {
       if (this.text.trim() !== "") {

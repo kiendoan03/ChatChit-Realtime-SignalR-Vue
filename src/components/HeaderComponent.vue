@@ -77,25 +77,67 @@
               <q-scroll-area style="height: 38vmax; max-width: 30vmax;">
                 <nav class="route ">
                     <RouterLink to="/chatLobby"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
-                    <div v-for="room in rooms" :key="room.id">
+                    <!-- <div v-for="room in rooms" :key="room.id">
                       <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
-                    </div>
-                    <div v-for="user in allUser" >
+                    </div> -->
+                    <!-- <div v-for="user in allUser" >
                       <RouterLink :to="'/chatPrivate/' + user.id" >
                         <q-avatar>
                           <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
                         </q-avatar>
                         <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
                       </RouterLink>
-                    </div>
-                    <!-- <div v-for="user in userActive" :key="user.id">
-                      <RouterLink :to="'/chatPrivate/' + user.id" >
-                        <q-avatar>
-                          <img src="https://cdn.quasar.dev/img/avatar5.jpg">
-                        </q-avatar>
-                        <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
-                      </RouterLink>
                     </div> -->
+                    <div class="q-pa-md flex ">
+                      <div style="max-width: 90%; width: 300px;">
+                        <q-intersection
+                          v-for="room in rooms"
+                          :key="room.id"
+                          transition="flip-right"
+                          class="example-item"
+                        >
+                        <RouterLink :to="'/chatRoom/' + room.id" >
+                          <q-item clickable v-ripple>
+                            <q-item-section avatar>
+                              <q-avatar color="primary" text-color="white">
+                                {{ generateAvatarFromName(room.roomName) }}
+                              </q-avatar>
+                            </q-item-section>
+                            <q-item-section>
+                                <q-item-label class ="text-white">{{ room.roomName }}</q-item-label>
+                                <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
+                            </q-item-section>
+                            </q-item> 
+                          </RouterLink>
+                          </q-intersection>
+                        </div>
+                      </div>
+                    <div class="q-pa-md flex ">
+                      <div style="max-width: 90%; width: 300px;">
+                        <q-intersection
+                          v-for="user in allUser"
+                          :key="user.id"
+                          transition="flip-right"
+                          class="example-item"
+                        > 
+                        <RouterLink :to="'/chatPrivate/' + user.id" >
+                          <q-item clickable v-ripple>
+                            <q-item-section avatar>
+                              <q-avatar color="primary" text-color="white">
+                                {{ generateAvatarFromName(user.displayName) }}
+                              </q-avatar>
+                            </q-item-section>
+                         
+                            <q-item-section>
+                                <q-item-label class ="text-white">{{ user.displayName }}</q-item-label>
+                                <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </RouterLink>
+                          
+                          </q-intersection>
+                        </div>
+                      </div>
                 </nav>
               </q-scroll-area>
           </q-page>
@@ -170,6 +212,16 @@ import { RouterLink } from 'vue-router'
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
+    },
+    generateAvatarFromName(name) {
+        const words = name.split(' ');
+        let avatar = '';
+        words.forEach(word => {
+            if (word.length > 0) {
+                avatar += word[0];
+            }
+        });
+        return avatar.toUpperCase();
     },
     listenForNewRoom() {
       this.connection.on("addChatRoom", (newRoom) => {
