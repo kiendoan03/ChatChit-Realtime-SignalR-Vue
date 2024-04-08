@@ -17,20 +17,34 @@ library.add(fas)
       <q-chat-message 
         name="Me"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
-        :text="[message.content]"
-        :size="messageSize[index]"
+        :size= "messageSize[index]"
         sent
         :stamp="[message.sendAt]"
-        v-if="message.sender === this.user"
-      />
+        v-if="message.sender === this.user "
+      >
+      <div>
+        <span v-for="(element, index) in message.content">
+          <span v-if="typeof element === 'string'">{{ element }}</span>
+          <img v-else-if="element.type === 'image'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+        </span>
+      </div>
+      
+      
+      </q-chat-message>
        <!--  -->
       <q-chat-message v-else
         :name="[message.sender]"
         avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
-        :text="[message.content]"
-        :size="messageSize[index]"
+        :size = "messageSize[index]"
         :stamp="[message.sendAt]" 
-      />
+      >
+        <div>
+          <span v-for="(element, index) in message.content">
+            <span v-if="typeof element === 'string'">{{ element }}</span>
+            <img v-else-if="element.type === 'image'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+          </span>
+        </div>
+      </q-chat-message>
       <!-- -->
     </div>
   </div>
@@ -114,15 +128,45 @@ export default {
     },
     listenForChatHistory() {
       this.connection.on("ReceiveChatHistoryLobby", (messages) => {
-        // Cập nhật dữ liệu lịch sử chat
-        console.log(messages);
         messages.forEach(message => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-          this.messages.push( {sender:message.fromUser,content:message.content, id: message.id, sendAt: elapsedTime} );
+          let messageContent = message.content;
+
+          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+
+          // Kiểm tra nếu tin nhắn chứa hình ảnh
+          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          let match;
+          let lastIndex = 0;
+
+          while ((match = imageRegex.exec(messageContent)) !== null) {
+            // Thêm văn bản trước hình ảnh (nếu có)
+            if (match.index > lastIndex) {
+              messageElements.push(messageContent.substring(lastIndex, match.index));
+            }
+            // Thêm hình ảnh
+            messageElements.push({ type: 'image', src: match[1] });
+            lastIndex = imageRegex.lastIndex;
+          }
+
+          // Thêm văn bản cuối cùng (nếu có)
+          if (lastIndex < messageContent.length) {
+            messageElements.push(messageContent.substring(lastIndex));
+          }
+
+          // Thêm tin nhắn vào mảng messages với nội dung đã được phân tích
+          this.messages.push({
+            sender: message.fromUser,
+            content: messageElements,
+            id: message.id,
+            sendAt: elapsedTime
+          });
         });
+
+        // Sau khi thêm tin nhắn vào messages, tính toán kích thước của mỗi tin nhắn
         this.calculateMessageSize();
         this.scrollToBottom();
-      }); 
+      });
     },
     calculateElapsedTime(sentAt) {
       const now = new Date(); // Thời gian hiện tại
@@ -158,26 +202,49 @@ export default {
     calculateMessageSize() {
       this.messages.forEach(message => {
         const messageLength = message.content.length;
-        console.log(1);
+        console.log(message.content);
         console.log(messageLength);
         let size = 1;
         if (messageLength < 50) {
-          size = 1; // Small size
+          size = 2; // Small size
         } else if (messageLength < 100) {
-          size = 2; // Medium size
+          size = 3; // Medium size
         } else {
-          size = 4; // Large size
+          size = 5; // Large size
         }
         this.messageSize.push(size); // Push integer size value
+        console.log(this.messageSize);
       });
     },
     listenForMessages() {
-      // this.connection.on("ReceiveMessage", (sender, content) => {
-      //   this.messages.push( {sender,content} );
-      // });
       this.connection.on("ReceiveMessage", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
-        this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
+        let messageContent = message.content;
+
+        // Tạo một mảng để chứa các phần tử của tin nhắn (văn bản và hình ảnh)
+        const messageElements = [];
+
+        // Kiểm tra nếu tin nhắn chứa hình ảnh
+        const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+        let match;
+        let lastIndex = 0;
+
+        while ((match = imageRegex.exec(messageContent)) !== null) {
+          // Thêm văn bản trước hình ảnh (nếu có)
+          if (match.index > lastIndex) {
+            messageElements.push(messageContent.substring(lastIndex, match.index));
+          }
+          // Thêm hình ảnh
+          messageElements.push({ type: 'image', src: match[1] });
+          lastIndex = imageRegex.lastIndex;
+        }
+
+        // Thêm văn bản cuối cùng (nếu có)
+        if (lastIndex < messageContent.length) {
+          messageElements.push(messageContent.substring(lastIndex));
+        }
+          
+        this.messages.push( {sender: message.fromUser, content: messageElements, sendAt: elapsedTime} );
         this.scrollToBottom();
       });
       this.calculateMessageSize();
