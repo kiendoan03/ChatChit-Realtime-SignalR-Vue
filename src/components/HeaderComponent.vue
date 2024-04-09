@@ -92,7 +92,13 @@
                             </q-item-section>
                             <q-item-section>
                                 <q-item-label class ="text-white">Lobby</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">{{this.lastMessageLobby.fromUser }}:
+                                <q-item-label caption lines="1" class ="text-secondary">
+                                  <span class="text-secondary" v-if="this.lastMessageLobby.fromUser != this.user.name">
+                                    {{this.lastMessageLobby.fromUser }}:
+                                  </span>
+                                  <span v-else class="text-secondary">
+                                    You:
+                                  </span>
                                    <template v-for="(element, index) in lastMessageLobby.content">
                                     <span v-if="typeof element === 'string'">{{ element }}</span>
                                     <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
@@ -124,9 +130,14 @@
                             </q-item-section>
                             <q-item-section >
                                 <q-item-label class ="text-white">{{ room.roomName }}</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">
+                                <q-item-label caption lines="1" class="text-grey-6">
                                   <template v-if="lastMessageRoom[room.id]">
-                                    {{ lastMessageRoom[room.id].fromUser }}:
+                                    <span class ="text-secondary" v-if="lastMessageRoom[room.id].fromUser != this.user.name">
+                                       {{ lastMessageRoom[room.id].fromUser }}:
+                                    </span>
+                                    <span class="text-secondary" v-else >
+                                      You:
+                                    </span>
                                     <template v-for="(element, index) in lastMessageRoom[room.id].content">
                                         <span v-if="typeof element === 'string'">{{ element }}</span>
                                         <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
@@ -150,25 +161,30 @@
                     <div class="q-pa-md flex ">
                       <div style="max-width: 90%; width: 30vmax;">
                         <q-intersection
-                          v-for="user in allUser"
-                          :key="user.id"
+                          v-for="users in allUser"
+                          :key="users.id"
                           transition="flip-right"
                           class="example-item"
                         > 
-                        <RouterLink :to="'/chatPrivate/' + user.id" >
+                        <RouterLink :to="'/chatPrivate/' + users.id" >
                           <q-item v-ripple style="width: 30vmax;">
                             <q-item-section avatar>
                               <q-avatar color="primary" text-color="white">
-                                {{ generateAvatarFromName(user.displayName) }}
+                                {{ generateAvatarFromName(users.displayName) }}
                               </q-avatar>
                             </q-item-section>
                          
                             <q-item-section>
-                                <q-item-label class ="text-white">{{ user.displayName }}</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">
-                                  <template v-if="lastMessagePrivate[user.id]">
-                                    {{ lastMessagePrivate[user.id].fromUser }}
-                                    <template v-for="(element, index) in lastMessagePrivate[user.id].content">
+                                <q-item-label class ="text-white">{{ users.displayName }}</q-item-label>
+                                <q-item-label caption lines="1" class ="text-grey-6">
+                                  <template v-if="lastMessagePrivate[users.id]">
+                                    <span class ="text-secondary" v-if="lastMessagePrivate[users.id].fromUser != '' && lastMessagePrivate[users.id].fromUser != this.user.name ">
+                                       {{ lastMessagePrivate[users.id].fromUser }}: 
+                                    </span>
+                                    <span class="text-secondary" v-else-if="lastMessagePrivate[users.id].fromUser != ''" >
+                                      You:
+                                    </span>
+                                    <template v-for="(element, index) in lastMessagePrivate[users.id].content">
                                         <span v-if="typeof element === 'string'">{{ element }}</span>
                                         <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
                                     </template>
@@ -176,8 +192,8 @@
                                 </q-item-label>
                             </q-item-section>
                             <q-item-section side style="font-size: small;">
-                              <div v-if="lastMessagePrivate[user.id]" class="message-sent-at">
-                                  {{ lastMessagePrivate[user.id].sentAt }}
+                              <div v-if="lastMessagePrivate[users.id]" class="message-sent-at">
+                                  {{ lastMessagePrivate[users.id].sentAt }}
                               </div>
                               <div v-else>
                                   No messages yet
@@ -515,7 +531,7 @@ import { RouterLink } from 'vue-router'
             }
 
             this.lastMessagePrivate[receiverId] = {
-              fromUser: message.fromUser + ":",
+              fromUser: message.fromUser,
               content: messageElements,
               sentAt: elapsedTime,
             };
