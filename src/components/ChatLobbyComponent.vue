@@ -270,12 +270,19 @@ export default {
           .then(() => {
             console.log("Message sent successfully");
             this.text = ""; // Clear input field after sending message
+            this.getLastMessageInLobby();
           })
           .catch((error) => {
             console.error("Error sending message: ", error);
           });
       }
     },
+    getLastMessageInLobby(){
+        this.connection.invoke("GetLastMessageInLobby")
+        .catch((error) => {
+          console.error("Error getting last message in lobby: ", error);
+        });
+      },
     getUser() {
       if (localStorage.getItem('token')){
         this.user = localStorage.getItem('displayName');
