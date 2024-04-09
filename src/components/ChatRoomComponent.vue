@@ -211,6 +211,8 @@ export default {
                     .then(() => {
                         console.log("Message sent successfully");
                         this.text = ""; 
+                        const roomId_int = parseInt(roomId);
+                        this.getLastMessageInRoom(roomId_int);
                     })
                     .catch((error) => {
                         console.error("Error sending message: ", error);
@@ -269,6 +271,12 @@ export default {
         }); 
         console.log(this.messages);
     },
+    getLastMessageInRoom(roomId){
+        this.connection.invoke("GetLastMessageInRoom", roomId)
+        .catch((error) => {
+          console.error("Error getting last message in room: ", error);
+        });
+      },
     calculateMessageSize() {
       this.messages.forEach(message => {
         let size = 1; 
