@@ -91,7 +91,7 @@
                               </q-avatar>
                             </q-item-section>
                             <q-item-section>
-                                <q-item-label class ="text-white">Lobby</q-item-label>
+                                <q-item-label class ="text-white"><font-awesome-icon :icon="['fas', 'user-group']" size="2xs" /> Lobby</q-item-label>
                                 <q-item-label caption lines="1" class ="text-secondary">
                                   <span class="text-secondary" v-if="this.lastMessageLobby.fromUser != this.user.name">
                                     {{this.lastMessageLobby.fromUser }}:
@@ -129,7 +129,7 @@
                               </q-avatar>
                             </q-item-section>
                             <q-item-section >
-                                <q-item-label class ="text-white">{{ room.roomName }}</q-item-label>
+                                <q-item-label class ="text-white"><font-awesome-icon :icon="['fas', 'user-group']" size="2xs" />  {{ room.roomName }}</q-item-label>
                                 <q-item-label caption lines="1" class="text-grey-6">
                                   <template v-if="lastMessageRoom[room.id]">
                                     <span class ="text-secondary" v-if="lastMessageRoom[room.id].fromUser != this.user.name">
