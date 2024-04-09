@@ -202,6 +202,7 @@ export default {
                     .then(() => {
                         console.log("Message sent successfully");
                         this.text = ""; // Clear input field after sending message
+                        this.getLastMessagePrivate(this.userId, this.$route.params.id);
                     })
                     .catch((error) => {
                         console.error("Error sending message: ", error);
@@ -213,6 +214,12 @@ export default {
             // Xử lý lỗi ở đây
         }
     },
+    getLastMessagePrivate(senderId, receiverId){
+        this.connection.invoke("GetLastMessagePrivate", senderId, receiverId)
+        .catch((error) => {
+          console.error("Error getting last message in private: ", error);
+        });
+      },
     generateAvatarFromName(name) {
         const words = name.split(' ');
         let avatar = '';

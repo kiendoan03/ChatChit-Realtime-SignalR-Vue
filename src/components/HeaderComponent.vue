@@ -281,7 +281,7 @@ import { RouterLink } from 'vue-router'
         });
         this.allUser.forEach(user => {
           this.getLastMessagePrivate(this.user.id, user.id);
-          this.listenForLastMessagePrivate(this.user.id, user.id);
+          this.listenForLastMessagePrivate(user.id);
         });
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
@@ -503,8 +503,8 @@ import { RouterLink } from 'vue-router'
           console.error("Error getting last message in private: ", error);
         });
       },
-      listenForLastMessagePrivate(senderId, receiverId){
-        this.connection.on("ReceiveLastMessagePrivate" + senderId + receiverId, (message) => {
+      listenForLastMessagePrivate(receiverId){
+        this.connection.on("ReceiveLastMessagePrivate" + receiverId, (message) => {
           if(message && message.sendAt){
              const elapsedTime = this.calculateElapsedTime(message.sendAt);
             let messageContent = message.content;
