@@ -77,18 +77,36 @@
           <q-page class="q-pa-md">
               <q-scroll-area style="height: 38vmax; max-width: 30vmax;">
                 <nav class="route ">
-                    <RouterLink to="/chatLobby"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
-                    <!-- <div v-for="room in rooms" :key="room.id">
-                      <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
-                    </div> 
-                     <div v-for="user in allUser" >
-                      <RouterLink :to="'/chatPrivate/' + user.id" >
-                        <q-avatar>
-                          <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
-                        </q-avatar>
-                        <span style="margin-left: 1vmax;">{{ user.displayName }}</span> 
-                      </RouterLink>
-                    </div> -->
+                  <div class="q-pa-md flex ">
+                      <div style="max-width: 90%; width: 30vmax;">
+                        <q-intersection
+                          transition="flip-right"
+                          class="example-item"
+                        >
+                        <RouterLink to="/chatLobby" >
+                          <q-item v-ripple style="width: 30vmax;">
+                            <q-item-section avatar>
+                              <q-avatar color="light-green-4" text-color="white">
+                                {{ generateAvatarFromName('Lobby') }}
+                              </q-avatar>
+                            </q-item-section>
+                            <q-item-section>
+                                <q-item-label class ="text-white">Lobby</q-item-label>
+                                <q-item-label caption lines="1" class ="text-secondary">{{this.lastMessageLobby.fromUser }}:
+                                   <template v-for="(element, index) in lastMessageLobby.content">
+                                    <span v-if="typeof element === 'string'">{{ element }}</span>
+                                    <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+                                  </template>
+                                </q-item-label>
+                            </q-item-section>
+                            <q-item-section side style="font-size: small;">
+                              {{ this.lastMessageLobby.sentAt}}
+                            </q-item-section>
+                            </q-item> 
+                          </RouterLink>
+                          </q-intersection>
+                        </div>
+                      </div>
                     <div class="q-pa-md flex ">
                       <div style="max-width: 90%; width: 30vmax;">
                         <q-intersection
@@ -104,12 +122,25 @@
                                 {{ generateAvatarFromName(room.roomName) }}
                               </q-avatar>
                             </q-item-section>
-                            <q-item-section>
+                            <q-item-section >
                                 <q-item-label class ="text-white">{{ room.roomName }}</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
+                                <q-item-label caption lines="1" class ="text-secondary">
+                                  <template v-if="lastMessageRoom[room.id]">
+                                    {{ lastMessageRoom[room.id].fromUser }}:
+                                    <template v-for="(element, index) in lastMessageRoom[room.id].content">
+                                        <span v-if="typeof element === 'string'">{{ element }}</span>
+                                        <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+                                    </template>
+                                  </template>
+                                </q-item-label>
                             </q-item-section>
-                            <q-item-section side>
-                              <font-awesome-icon :icon="['fab', 'rocketchat']" />
+                            <q-item-section side style="font-size: small;">
+                              <div v-if="lastMessageRoom[room.id]" class="message-sent-at">
+                                  {{ lastMessageRoom[room.id].sentAt }}
+                              </div>
+                              <div v-else>
+                                  No messages yet
+                              </div>
                             </q-item-section>
                             </q-item> 
                           </RouterLink>
@@ -134,10 +165,23 @@
                          
                             <q-item-section>
                                 <q-item-label class ="text-white">{{ user.displayName }}</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
+                                <q-item-label caption lines="1" class ="text-secondary">
+                                  <template v-if="lastMessagePrivate[user.id]">
+                                    {{ lastMessagePrivate[user.id].fromUser }}
+                                    <template v-for="(element, index) in lastMessagePrivate[user.id].content">
+                                        <span v-if="typeof element === 'string'">{{ element }}</span>
+                                        <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
+                                    </template>
+                                  </template>
+                                </q-item-label>
                             </q-item-section>
-                            <q-item-section side>
-                              <font-awesome-icon :icon="['fab', 'rocketchat']" />
+                            <q-item-section side style="font-size: small;">
+                              <div v-if="lastMessagePrivate[user.id]" class="message-sent-at">
+                                  {{ lastMessagePrivate[user.id].sentAt }}
+                              </div>
+                              <div v-else>
+                                  No messages yet
+                              </div>
                             </q-item-section>
                           </q-item>
                         </RouterLink>
@@ -188,7 +232,9 @@ import { RouterLink } from 'vue-router'
         rooms: [],
         allUser:[],
         userActive: [],
-        // active: false,
+        lastMessageLobby:{},
+        lastMessageRoom:[],
+        lastMessagePrivate:[]
       }
     }, 
     created() {
@@ -208,17 +254,53 @@ import { RouterLink } from 'vue-router'
 
       this.connection.start().then(() => {
         console.log("Connected to SignalR Hub");
-        // this.checkUserActive();
-        // this.listenForUserActive();
-        // this.getAllUsers(this.user.id);
         this.listenForUsers();
         this.listenJoinNewRoom(this.user.id);
-        console.log(this.user.id);
-        this.listonForLeaveRoom(this.user.id);
-        // this.listenForNewRoom();
+        this.listenForLeaveRoom(this.user.id);
+        this.getLastMessageInLobby();
+        this.listenForLastMessageInLobby();
+        this.rooms.forEach(room => {
+          this.getLastMessageInRoom(room.id);
+          this.listenForLastMessageInRoom(room.id);
+        });
+        this.allUser.forEach(user => {
+          this.getLastMessagePrivate(this.user.id, user.id);
+          this.listenForLastMessagePrivate(this.user.id, user.id);
+        });
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
+    },
+    calculateElapsedTime(sentAt) {
+      const now = new Date(); // Thời gian hiện tại
+      const sentTime = new Date(sentAt); // Thời gian gửi tin nhắn
+      const elapsed = now - sentTime; // Thời gian trôi qua (đơn vị: mili giây)
+
+      // Chuyển đổi thời gian trôi qua thành đơn vị phù hợp (ví dụ: phút, giờ, ngày)
+      const secondsElapsed = Math.floor(elapsed / 1000); // 1000 mili giây = 1 giây
+      const minutesElapsed = Math.floor(elapsed / 60000); // 60000 mili giây = 1 phút
+      const hoursElapsed = Math.floor(elapsed / 3600000); // 3600000 mili giây = 1 giờ
+      const daysElapsed = Math.floor(elapsed / 86400000); // 86400000 mili giây = 1 ngày
+      const yearsElapsed = Math.floor(elapsed / 31536000000); // 31536000000 mili giây = 1 năm
+
+      // Trả về thời gian trôi qua dưới dạng chuỗi để hiển thị cho người dùng
+      if (yearsElapsed > 0) {
+          return `${yearsElapsed} years ago`;
+      } else if (daysElapsed > 0) {
+          return `${daysElapsed} days ago`;
+      } else if (hoursElapsed > 0) {
+          return `${hoursElapsed} hours ago`;
+      } else if (minutesElapsed > 0){
+          return `${minutesElapsed} minutes ago`;
+      } else if (secondsElapsed == 0){
+          return `Just now`;
+      } else if (secondsElapsed == 1){
+          return `${secondsElapsed} second ago`;
+      } else if (secondsElapsed > 1){
+          return `${secondsElapsed} seconds ago`;
+      } else {
+          return `${secondsElapsed} seconds ago`;
+      } 
     },
     generateAvatarFromName(name) {
         const words = name.split(' ');
@@ -234,7 +316,6 @@ import { RouterLink } from 'vue-router'
       this.connection.on("addChatRoom", (newRoom) => {
         this.rooms.push( newRoom );
         console.log(newRoom);
-        // this.scrollToBottom();
       });
     },
       logout() {
@@ -262,10 +343,6 @@ import { RouterLink } from 'vue-router'
           this.allUser = res.data;
           console.log(this.allUser);
         })
-        // this.connection.invoke("GetUserExceptMe", userId)
-        // .catch((error) => {
-        //   console.error("Error getting all user: ", error);
-        // });
       },
       listenForUsers(){
         this.connection.on("newUser", (users) => {
@@ -288,13 +365,9 @@ import { RouterLink } from 'vue-router'
           this.$forceUpdate();
         });
       },
-      listonForLeaveRoom(userId){
+      listenForLeaveRoom(userId){
         this.connection.on("LeaveGroup" + userId, (room) => {
           this.rooms = this.rooms.filter(rooms => rooms.id !== room.id);
-          // const index = this.rooms.findIndex(rooms => rooms.id === room.id);
-          //   if (index !== -1) {
-          //       this.rooms.splice(index, 1);
-          //   }
           console.log(room);
           this.$forceUpdate();
         });
@@ -328,7 +401,134 @@ import { RouterLink } from 'vue-router'
           console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
         }
       },
-    }
+      getLastMessageInLobby(){
+        this.connection.invoke("GetLastMessageInLobby")
+        .catch((error) => {
+          console.error("Error getting last message in lobby: ", error);
+        });
+      },
+      listenForLastMessageInLobby(){
+        this.connection.on("ReceiveLastMessageInLobby", (message) => {
+          const elapsedTime = this.calculateElapsedTime(message.sendAt);
+          let messageContent = message.content;
+
+          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+
+          // Kiểm tra nếu tin nhắn chứa hình ảnh
+          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          let match;
+          let lastIndex = 0;
+
+          while ((match = imageRegex.exec(messageContent)) !== null) {
+            // Thêm văn bản trước hình ảnh (nếu có)
+            if (match.index > lastIndex) {
+              messageElements.push(messageContent.substring(lastIndex, match.index));
+            }
+            // Thêm hình ảnh
+            messageElements.push({ type: 'emoji', src: match[1] });
+            lastIndex = imageRegex.lastIndex;
+          }
+          // Thêm văn bản cuối cùng (nếu có)
+          if (lastIndex < messageContent.length) {
+            messageElements.push(messageContent.substring(lastIndex));
+          }
+
+          this.lastMessageLobby = {
+            fromUser: message.fromUser,
+            content: messageElements,
+            sentAt: elapsedTime,
+          };
+
+        });
+      },
+      getLastMessageInRoom(roomId){
+        this.connection.invoke("GetLastMessageInRoom", roomId)
+        .catch((error) => {
+          console.error("Error getting last message in room: ", error);
+        });
+      },
+      listenForLastMessageInRoom(roomId){
+        this.connection.on("ReceiveLastMessageInRoom" +  roomId, (message) => {
+          const elapsedTime = this.calculateElapsedTime(message.sendAt);
+          let messageContent = message.content;
+
+          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+
+          // Kiểm tra nếu tin nhắn chứa hình ảnh
+          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          let match;
+          let lastIndex = 0;
+
+          while ((match = imageRegex.exec(messageContent)) !== null) {
+            // Thêm văn bản trước hình ảnh (nếu có)
+            if (match.index > lastIndex) {
+              messageElements.push(messageContent.substring(lastIndex, match.index));
+            }
+            // Thêm hình ảnh
+            messageElements.push({ type: 'emoji', src: match[1] });
+            lastIndex = imageRegex.lastIndex;
+          }
+          // Thêm văn bản cuối cùng (nếu có)
+          if (lastIndex < messageContent.length) {
+            messageElements.push(messageContent.substring(lastIndex));
+          }
+
+            this.lastMessageRoom[roomId] = {
+            fromUser: message.fromUser,
+            content: messageElements,
+            sentAt: elapsedTime,
+            roomId: message.room
+          };
+        });
+      },
+      getLastMessagePrivate(senderId, receiverId){
+        this.connection.invoke("GetLastMessagePrivate", senderId, receiverId)
+        .catch((error) => {
+          console.error("Error getting last message in private: ", error);
+        });
+      },
+      listenForLastMessagePrivate(senderId, receiverId){
+        this.connection.on("ReceiveLastMessagePrivate" + senderId + receiverId, (message) => {
+          if(message && message.sendAt){
+             const elapsedTime = this.calculateElapsedTime(message.sendAt);
+            let messageContent = message.content;
+
+            const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+
+            // Kiểm tra nếu tin nhắn chứa hình ảnh
+            const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+            let match;
+            let lastIndex = 0;
+
+            while ((match = imageRegex.exec(messageContent)) !== null) {
+              // Thêm văn bản trước hình ảnh (nếu có)
+              if (match.index > lastIndex) {
+                messageElements.push(messageContent.substring(lastIndex, match.index));
+              }
+              // Thêm hình ảnh
+              messageElements.push({ type: 'emoji', src: match[1] });
+              lastIndex = imageRegex.lastIndex;
+            }
+            // Thêm văn bản cuối cùng (nếu có)
+            if (lastIndex < messageContent.length) {
+              messageElements.push(messageContent.substring(lastIndex));
+            }
+
+            this.lastMessagePrivate[receiverId] = {
+              fromUser: message.fromUser + ":",
+              content: messageElements,
+              sentAt: elapsedTime,
+            };
+          }else{
+            this.lastMessagePrivate[receiverId] = {
+              fromUser: '',
+              content: '',
+              sentAt: '',
+            };
+          }
+        });
+      },
+      }
   }         
 </script>
 
