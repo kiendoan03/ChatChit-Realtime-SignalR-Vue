@@ -2,9 +2,10 @@
     import { QLayout, QHeader, QToolbar, QBtn, QSpace, QPageContainer, QPage, QIcon } from 'quasar'
     import { library } from '@fortawesome/fontawesome-svg-core'
     import { fas } from '@fortawesome/free-solid-svg-icons'
+    import { fab } from '@fortawesome/free-brands-svg-icons'
     import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-    library.add(fas)
+    library.add(fas, fab)
     
 
 </script>
@@ -79,8 +80,8 @@
                     <RouterLink to="/chatLobby"  ><img src="../assets/images/lobby.png" style="border-radius: 50%;object-fit: cover; overflow: hidden;height: 2.8vmax; width: 2.8vmax;"> Lobby</RouterLink>
                     <!-- <div v-for="room in rooms" :key="room.id">
                       <RouterLink :to="'/chatRoom/' + room.id" ># {{ room.roomName }}</RouterLink>
-                    </div> -->
-                    <!-- <div v-for="user in allUser" >
+                    </div> 
+                     <div v-for="user in allUser" >
                       <RouterLink :to="'/chatPrivate/' + user.id" >
                         <q-avatar>
                           <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
@@ -89,7 +90,7 @@
                       </RouterLink>
                     </div> -->
                     <div class="q-pa-md flex ">
-                      <div style="max-width: 90%; width: 300px;">
+                      <div style="max-width: 90%; width: 30vmax;">
                         <q-intersection
                           v-for="room in rooms"
                           :key="room.id"
@@ -97,7 +98,7 @@
                           class="example-item"
                         >
                         <RouterLink :to="'/chatRoom/' + room.id" >
-                          <q-item clickable v-ripple>
+                          <q-item v-ripple style="width: 30vmax;">
                             <q-item-section avatar>
                               <q-avatar color="primary" text-color="white">
                                 {{ generateAvatarFromName(room.roomName) }}
@@ -107,13 +108,16 @@
                                 <q-item-label class ="text-white">{{ room.roomName }}</q-item-label>
                                 <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
                             </q-item-section>
+                            <q-item-section side>
+                              <font-awesome-icon :icon="['fab', 'rocketchat']" />
+                            </q-item-section>
                             </q-item> 
                           </RouterLink>
                           </q-intersection>
                         </div>
                       </div>
                     <div class="q-pa-md flex ">
-                      <div style="max-width: 90%; width: 300px;">
+                      <div style="max-width: 90%; width: 30vmax;">
                         <q-intersection
                           v-for="user in allUser"
                           :key="user.id"
@@ -121,7 +125,7 @@
                           class="example-item"
                         > 
                         <RouterLink :to="'/chatPrivate/' + user.id" >
-                          <q-item clickable v-ripple>
+                          <q-item v-ripple style="width: 30vmax;">
                             <q-item-section avatar>
                               <q-avatar color="primary" text-color="white">
                                 {{ generateAvatarFromName(user.displayName) }}
@@ -131,6 +135,9 @@
                             <q-item-section>
                                 <q-item-label class ="text-white">{{ user.displayName }}</q-item-label>
                                 <q-item-label caption lines="1" class ="text-secondary">last message</q-item-label>
+                            </q-item-section>
+                            <q-item-section side>
+                              <font-awesome-icon :icon="['fab', 'rocketchat']" />
                             </q-item-section>
                           </q-item>
                         </RouterLink>
