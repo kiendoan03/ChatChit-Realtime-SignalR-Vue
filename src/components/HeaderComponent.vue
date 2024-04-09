@@ -283,6 +283,7 @@ import { RouterLink } from 'vue-router'
           this.getLastMessagePrivate(this.user.id, user.id);
           this.listenForLastMessagePrivate(user.id);
         });
+        // this.sortConversationsByTime();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
@@ -336,8 +337,9 @@ import { RouterLink } from 'vue-router'
     },
       logout() {
         localStorage.clear();
-        this.$router.push('/');
-        this.$router.go();
+        this.$router.push('/').then(() => {
+          window.location.reload();
+        });
       },
       getUser() {
         this.user.name = localStorage.getItem('displayName');
@@ -453,6 +455,7 @@ import { RouterLink } from 'vue-router'
             fromUser: message.fromUser,
             content: messageElements,
             sentAt: elapsedTime,
+            // time: message.sendAt
           };
 
         });
@@ -493,7 +496,8 @@ import { RouterLink } from 'vue-router'
             fromUser: message.fromUser,
             content: messageElements,
             sentAt: elapsedTime,
-            roomId: message.room
+            roomId: message.room,
+            // time: message.sendAt
           };
         });
       },
@@ -534,16 +538,36 @@ import { RouterLink } from 'vue-router'
               fromUser: message.fromUser,
               content: messageElements,
               sentAt: elapsedTime,
+              // time: message.sendAt
             };
           }else{
             this.lastMessagePrivate[receiverId] = {
               fromUser: '',
               content: '',
               sentAt: '',
+              // time: ''
             };
           }
         });
       },
+      // sortConversationsByTime() {
+      //   this.rooms.sort((a, b) => {
+      //       if (this.lastMessageRoom[a.id] && this.lastMessageRoom[b.id]) {
+      //         return new Date(this.lastMessageRoom[b.id].time) - new Date(this.lastMessageRoom[a.id].time);
+      //       } else {
+      //         return 0; // Không có tin nhắn cuối cùng, không có sắp xếp
+      //       }
+      //     });
+
+      //     // Sắp xếp danh sách người dùng
+      //     this.allUser.sort((a, b) => {
+      //       if (this.lastMessagePrivate[a.id] && this.lastMessagePrivate[b.id]) {
+      //         return new Date(this.lastMessagePrivate[b.id].time) - new Date(this.lastMessagePrivate[a.id].time);
+      //       } else {
+      //         return 0; // Không có tin nhắn cuối cùng, không có sắp xếp
+      //       }
+      //     });
+      //   },
       }
   }         
 </script>
