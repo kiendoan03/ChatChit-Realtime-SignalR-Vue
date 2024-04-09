@@ -14,7 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
         <q-header elevated class="bg-transparent">
           <q-toolbar>
             <q-avatar color="primary" text-color="white">
-              {{ generateAvatarFromName(this.user.displayName) }}
+              {{ user && user.displayName ? generateAvatarFromName(user.displayName) : '' }}
             </q-avatar>
             <q-toolbar-title>
               <strong class="text-dark">{{this.user.displayName}}</strong>
@@ -70,20 +70,20 @@ import * as signalR from "@aspnet/signalr";
             });
           },
           generateAvatarFromName(name) {
-              const words = name.split(' ');
-              let avatar = '';
-              words.forEach(word => {
-                  if (word.length > 0) {
-                      avatar += word[0];
-                  }
-              });
-              return avatar.toUpperCase();
-          },
+                const words = name.split(' ');
+                let avatar = '';
+                words.forEach(word => {
+                    if (word.length > 0) {
+                        avatar += word[0];
+                    }
+                });
+                return avatar.toUpperCase();
+            },
           getUser(userid){
             axios.get('https://localhost:7014/api/Users/'+userid)
             .then(response => {
               this.user = response.data;
-              console.log(response.data);
+              console.log(response.data); 
             })
             .catch(error => {
               console.log(error);

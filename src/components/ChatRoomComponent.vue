@@ -260,6 +260,9 @@ export default {
                 id: message.id,
                 sendAt: elapsedTime
               });
+              this.messages.sort((a, b) => {
+                  return a.id - b.id; // Sắp xếp theo thời gian gửi tăng dần
+              });
             });
             this.scrollToBottom();
             this.calculateMessageSize();
