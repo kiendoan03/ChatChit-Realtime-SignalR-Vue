@@ -92,14 +92,14 @@
                             </q-item-section>
                             <q-item-section>
                                 <q-item-label class ="text-white"><font-awesome-icon :icon="['fas', 'user-group']" size="2xs" /> Lobby</q-item-label>
-                                <q-item-label caption lines="1" class ="text-secondary">
+                                <q-item-label caption lines="1" class ="text-secondary" style="width: 15vmax;">
                                   <span class="text-secondary" v-if="this.lastMessageLobby.fromUser != this.user.name">
                                     {{this.lastMessageLobby.fromUser }}:
                                   </span>
                                   <span v-else class="text-secondary">
                                     You:
                                   </span>
-                                   <template v-for="(element, index) in lastMessageLobby.content">
+                                   <template v-for="(element, index) in lastMessageLobby.content" >
                                     <span v-if="typeof element === 'string'">{{ element }}</span>
                                     <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
                                   </template>
@@ -130,7 +130,7 @@
                             </q-item-section>
                             <q-item-section >
                                 <q-item-label class ="text-white"><font-awesome-icon :icon="['fas', 'user-group']" size="2xs" />  {{ room.roomName }}</q-item-label>
-                                <q-item-label caption lines="1" class="text-grey-6">
+                                <q-item-label caption lines="1" class="text-grey-6" style="width: 15vmax;">
                                   <template v-if="lastMessageRoom[room.id]">
                                     <span class ="text-secondary" v-if="lastMessageRoom[room.id].fromUser != this.user.name">
                                        {{ lastMessageRoom[room.id].fromUser }}:
@@ -176,7 +176,7 @@
                          
                             <q-item-section>
                                 <q-item-label class ="text-white">{{ users.displayName }}</q-item-label>
-                                <q-item-label caption lines="1" class ="text-grey-6">
+                                <q-item-label caption lines="1" class ="text-grey-6" style="width: 15vmax;">
                                   <template v-if="lastMessagePrivate[users.id]">
                                     <span class ="text-secondary" v-if="lastMessagePrivate[users.id].fromUser != '' && lastMessagePrivate[users.id].fromUser != this.user.name ">
                                        {{ lastMessagePrivate[users.id].fromUser }}: 
