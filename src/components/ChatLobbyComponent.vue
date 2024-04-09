@@ -16,33 +16,39 @@ library.add(fas)
     <div  v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
-        avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :size= "messageSize[index]"
         sent
         :stamp="[message.sendAt]"
         v-if="message.sender === this.user "
       >
+        <template v-slot:avatar >
+          <q-avatar color="pink-3" text-color="white"  class="q-message-avatar q-message-avatar--sent">
+            {{ generateAvatarFromName(this.user) }}
+          </q-avatar>
+        </template>
       <div>
-        <span v-for="(element, index) in message.content">
+        <template v-for="(element, index) in message.content">
           <span v-if="typeof element === 'string'">{{ element }}</span>
           <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-        </span>
+        </template>
       </div>
-      
-      
       </q-chat-message>
        <!--  -->
       <q-chat-message v-else
         :name="[message.sender]"
-        avatar="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg"
         :size = "messageSize[index]"
         :stamp="[message.sendAt]" 
       >
+      <template v-slot:avatar >
+          <q-avatar color="primary" text-color="white"   class="q-message-avatar q-message-avatar--received">
+            {{ generateAvatarFromName(message.sender) }}
+          </q-avatar>
+      </template>
         <div>
-          <span v-for="(element, index) in message.content">
+          <template v-for="(element, index) in message.content">
             <span v-if="typeof element === 'string'">{{ element }}</span>
             <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </span>
+          </template>
         </div>
       </q-chat-message>
       <!-- -->
@@ -52,8 +58,8 @@ library.add(fas)
     <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessage" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
-          <q-avatar>
-            <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
+          <q-avatar color="pink-3" text-color="white">
+            {{ generateAvatarFromName(this.user) }}
           </q-avatar>
         </template>
 
@@ -69,8 +75,6 @@ library.add(fas)
           </div>
         </template>
     </q-input>
-    <!-- <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type your message..."> -->
-    <!-- <button type="button" @click="sendMessage">Send</button> -->
   </div>
   
 </template>
@@ -165,6 +169,16 @@ export default {
         this.calculateMessageSize();
         this.scrollToBottom();
       });
+    },
+    generateAvatarFromName(name) {
+        const words = name.split(' ');
+        let avatar = '';
+        words.forEach(word => {
+            if (word.length > 0) {
+                avatar += word[0];
+            }
+        });
+        return avatar.toUpperCase();
     },
     calculateElapsedTime(sentAt) {
       const now = new Date(); // Thời gian hiện tại

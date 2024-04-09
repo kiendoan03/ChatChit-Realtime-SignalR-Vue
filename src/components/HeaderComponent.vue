@@ -100,7 +100,7 @@
                         <RouterLink :to="'/chatRoom/' + room.id" >
                           <q-item v-ripple style="width: 30vmax;">
                             <q-item-section avatar>
-                              <q-avatar color="primary" text-color="white">
+                              <q-avatar color="cyan-3" text-color="white">
                                 {{ generateAvatarFromName(room.roomName) }}
                               </q-avatar>
                             </q-item-section>
@@ -152,8 +152,8 @@
         <q-footer elevated class="bg-dark text-white">
           <q-toolbar>
             <div class="user">
-              <q-avatar>
-                <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
+              <q-avatar color="pink-3" text-color="white">
+                  {{ generateAvatarFromName(this.user.name) }}
               </q-avatar>
               <span style="margin-left: 1.5vh;">{{ this.user.name }}</span>
             </div>

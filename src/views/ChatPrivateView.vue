@@ -13,9 +13,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
     <q-layout view="lHh lpr lFf" container style="height: 44.92vmax;" class="shadow-2 rounded-borders">
         <q-header elevated class="bg-transparent">
           <q-toolbar>
-            <q-avatar>
-                <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg">
-              </q-avatar>
+            <q-avatar color="primary" text-color="white">
+              {{ generateAvatarFromName(this.user.displayName) }}
+            </q-avatar>
             <q-toolbar-title>
               <strong class="text-dark">{{this.user.displayName}}</strong>
             </q-toolbar-title>
@@ -68,6 +68,16 @@ import * as signalR from "@aspnet/signalr";
             }).catch((error) => {
               console.error("Error connecting to SignalR Hub: ", error);
             });
+          },
+          generateAvatarFromName(name) {
+              const words = name.split(' ');
+              let avatar = '';
+              words.forEach(word => {
+                  if (word.length > 0) {
+                      avatar += word[0];
+                  }
+              });
+              return avatar.toUpperCase();
           },
           getUser(userid){
             axios.get('https://localhost:7014/api/Users/'+userid)

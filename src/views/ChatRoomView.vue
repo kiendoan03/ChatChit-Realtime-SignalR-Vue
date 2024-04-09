@@ -14,10 +14,10 @@ import { library } from '@fortawesome/fontawesome-svg-core'
     <q-layout view="lHh lpr lFf" container style="height: 44.92vmax;" class="shadow-2 rounded-borders">
         <q-header elevated class="bg-transparent">
           <q-toolbar>
-            <q-avatar>
-                <img src="https://static.vecteezy.com/system/resources/previews/026/019/617/original/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg">
+            <q-avatar color="cyan-3" text-color="white">
+              {{ generateAvatarFromName(this.room.roomName) }}
             </q-avatar>
-            <!-- <img src="https://static.vecteezy.com/system/resources/previews/026/019/617/original/group-profile-avatar-icon-default-social-media-forum-profile-photo-vector.jpg" style="width: 3%;" alt=""> -->
+            
             <q-toolbar-title>
               <strong class="text-dark">{{this.room.roomName}}</strong>
             </q-toolbar-title>
@@ -39,9 +39,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
                               <q-item-section>
                                 <q-checkbox v-model="user.checked"  :value="user.id" style="text-align: center;justify-content: center;">
                                  <q-item-section >
-                                    <q-avatar>
-                                      <img src="https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg" >
-                                    </q-avatar>
+                                  <q-avatar color="primary" text-color="white">
+                                    {{ generateAvatarFromName(user.displayName) }}
+                                  </q-avatar>
                                   </q-item-section>
                                   <!-- <q-item-section> -->
                                      <q-item-label>{{ user.displayName }}</q-item-label>
@@ -145,6 +145,16 @@ import * as signalR from "@aspnet/signalr";
                 .then(res => {
                     this.room = res.data;
                 })
+            },
+            generateAvatarFromName(name) {
+                const words = name.split(' ');
+                let avatar = '';
+                words.forEach(word => {
+                    if (word.length > 0) {
+                        avatar += word[0];
+                    }
+                });
+                return avatar.toUpperCase();
             },
             getUsers(roomId) {
             axios.get('https://localhost:7014/api/Users/GetUserNotInGroup?groupId='+roomId)
