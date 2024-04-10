@@ -47,7 +47,18 @@ library.add(fas)
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
-    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessage" style="width: 100%;"  label="Type your message" :dense="dense">
+    <div style="position: relative; display: inline-block;">
+      <img :src="pastedImage" v-if="pastedImage" alt="Pasted image" style="max-width: 100%; max-height: 100px; border-radius: 10px;">
+      <div v-if="pastedImage" style="position: absolute; top: -10px; right: -10px;">
+        <button @click="cancelImage" style="background: none; border: none; padding: 0; cursor: pointer;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM15.41 7.41L13 9.83L10.59 7.41L9.17 8.83L11.59 11.25L9.17 13.66L10.59 15.08L13 12.66L15.41 15.08L16.83 13.66L14.41 11.25L16.83 8.83L15.41 7.41Z" fill="grey"/>
+          </svg>
+        </button>s
+      </div>
+    </div>
+    <!-- <input ref="textInput" type="text" v-model="text" @paste="handlePaste"> -->
+    <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessage" style="width: 100%;" @paste="handlePaste"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar color="pink-3" text-color="white">
             {{ generateAvatarFromName(this.user) }}
@@ -93,7 +104,8 @@ export default {
       uploadFile:{
         file: '',
         fromUserId:''
-      }
+      },
+      pastedImage: null
     };
    
   },
@@ -104,6 +116,43 @@ export default {
     this.getUser();
   },
   methods: {
+    // isBase64(str) {
+    // // Kiểm tra định dạng chuỗi
+    // if (str.startsWith('data:image/jpeg;base64,')) {
+    //   return true;
+    // },
+    cancelImage() {
+      // Hủy bỏ hình ảnh
+      this.pastedImage = null;
+    },
+    handlePaste(event) {
+      // Ngăn chặn hành vi mặc định của paste để có thể xử lý dữ liệu
+      event.preventDefault();
+
+      // Lấy dữ liệu được paste
+      const clipboardData = event.clipboardData || window.clipboardData;
+      const pastedItems = clipboardData.items;
+
+      // Lặp qua các phần tử được paste
+      for (let i = 0; i < pastedItems.length; i++) {
+        const item = pastedItems[i];
+        
+        // Nếu phần tử được paste là hình ảnh, xử lý nó
+        if (item.type.indexOf('image') !== -1) {
+          const blob = item.getAsFile();
+          const reader = new FileReader();
+
+          // Đọc hình ảnh và hiển thị nó
+          reader.onload = (event) => {
+            this.pastedImage = event.target.result;
+            console.log(this.pastedImage);
+          };
+
+          reader.readAsDataURL(blob);
+          break; // Chỉ xử lý hình ảnh đầu tiên nếu có nhiều hình ảnh được paste
+        }
+      }
+    },
     openFileDialog() {
       console.log("Opening file dialog");
       const fileInput = document.querySelector('input[type="file"]');
