@@ -99,10 +99,13 @@
                                   <span v-else class="text-secondary">
                                     You:
                                   </span>
-                                   <template v-for="(element, index) in lastMessageLobby.content" >
+                                   <!-- <template v-for="(element, index) in lastMessageLobby.content" >
                                     <span v-if="typeof element === 'string'">{{ element }}</span>
                                     <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                  </template>
+                                  </template> -->
+                                  <span>
+                                    <span v-html="this.lastMessageLobby.content" ></span>
+                                  </span>
                                 </q-item-label>
                             </q-item-section>
                             <q-item-section side style="font-size: small;">
@@ -138,10 +141,13 @@
                                     <span class="text-secondary" v-else >
                                       You:
                                     </span>
-                                    <template v-for="(element, index) in lastMessageRoom[room.id].content">
+                                    <!-- <template v-for="(element, index) in lastMessageRoom[room.id].content">
                                         <span v-if="typeof element === 'string'">{{ element }}</span>
                                         <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                    </template>
+                                    </template> -->
+                                    <span>
+                                      <span v-html="this.lastMessageRoom[room.id].content" ></span>
+                                    </span>
                                   </template>
                                 </q-item-label>
                             </q-item-section>
@@ -184,10 +190,13 @@
                                     <span class="text-secondary" v-else-if="lastMessagePrivate[users.id].fromUser != ''" >
                                       You:
                                     </span>
-                                    <template v-for="(element, index) in lastMessagePrivate[users.id].content">
+                                    <!-- <template v-for="(element, index) in lastMessagePrivate[users.id].content">
                                         <span v-if="typeof element === 'string'">{{ element }}</span>
                                         <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                    </template>
+                                    </template> -->
+                                    <span>
+                                      <span v-html="this.lastMessagePrivate[users.id].content" ></span>
+                                    </span>
                                   </template>
                                 </q-item-label>
                             </q-item-section>
@@ -428,32 +437,32 @@ import { RouterLink } from 'vue-router'
       listenForLastMessageInLobby(){
         this.connection.on("ReceiveLastMessageInLobby", (message) => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-          let messageContent = message.content;
+          // let messageContent = message.content;
 
-          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+          // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-          // Kiểm tra nếu tin nhắn chứa hình ảnh
-          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-          let match;
-          let lastIndex = 0;
+          // // Kiểm tra nếu tin nhắn chứa hình ảnh
+          // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          // let match;
+          // let lastIndex = 0;
 
-          while ((match = imageRegex.exec(messageContent)) !== null) {
-            // Thêm văn bản trước hình ảnh (nếu có)
-            if (match.index > lastIndex) {
-              messageElements.push(messageContent.substring(lastIndex, match.index));
-            }
-            // Thêm hình ảnh
-            messageElements.push({ type: 'emoji', src: match[1] });
-            lastIndex = imageRegex.lastIndex;
-          }
-          // Thêm văn bản cuối cùng (nếu có)
-          if (lastIndex < messageContent.length) {
-            messageElements.push(messageContent.substring(lastIndex));
-          }
+          // while ((match = imageRegex.exec(messageContent)) !== null) {
+          //   // Thêm văn bản trước hình ảnh (nếu có)
+          //   if (match.index > lastIndex) {
+          //     messageElements.push(messageContent.substring(lastIndex, match.index));
+          //   }
+          //   // Thêm hình ảnh
+          //   messageElements.push({ type: 'emoji', src: match[1] });
+          //   lastIndex = imageRegex.lastIndex;
+          // }
+          // // Thêm văn bản cuối cùng (nếu có)
+          // if (lastIndex < messageContent.length) {
+          //   messageElements.push(messageContent.substring(lastIndex));
+          // }
 
           this.lastMessageLobby = {
             fromUser: message.fromUser,
-            content: messageElements,
+            content: message.content,
             sentAt: elapsedTime,
             // time: message.sendAt
           };
@@ -469,32 +478,32 @@ import { RouterLink } from 'vue-router'
       listenForLastMessageInRoom(roomId){
         this.connection.on("ReceiveLastMessageInRoom" +  roomId, (message) => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-          let messageContent = message.content;
+          // let messageContent = message.content;
 
-          const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+          // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-          // Kiểm tra nếu tin nhắn chứa hình ảnh
-          const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-          let match;
-          let lastIndex = 0;
+          // // Kiểm tra nếu tin nhắn chứa hình ảnh
+          // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+          // let match;
+          // let lastIndex = 0;
 
-          while ((match = imageRegex.exec(messageContent)) !== null) {
-            // Thêm văn bản trước hình ảnh (nếu có)
-            if (match.index > lastIndex) {
-              messageElements.push(messageContent.substring(lastIndex, match.index));
-            }
-            // Thêm hình ảnh
-            messageElements.push({ type: 'emoji', src: match[1] });
-            lastIndex = imageRegex.lastIndex;
-          }
-          // Thêm văn bản cuối cùng (nếu có)
-          if (lastIndex < messageContent.length) {
-            messageElements.push(messageContent.substring(lastIndex));
-          }
+          // while ((match = imageRegex.exec(messageContent)) !== null) {
+          //   // Thêm văn bản trước hình ảnh (nếu có)
+          //   if (match.index > lastIndex) {
+          //     messageElements.push(messageContent.substring(lastIndex, match.index));
+          //   }
+          //   // Thêm hình ảnh
+          //   messageElements.push({ type: 'emoji', src: match[1] });
+          //   lastIndex = imageRegex.lastIndex;
+          // }
+          // // Thêm văn bản cuối cùng (nếu có)
+          // if (lastIndex < messageContent.length) {
+          //   messageElements.push(messageContent.substring(lastIndex));
+          // }
 
             this.lastMessageRoom[roomId] = {
             fromUser: message.fromUser,
-            content: messageElements,
+            content: message.content,
             sentAt: elapsedTime,
             roomId: message.room,
             // time: message.sendAt
@@ -511,32 +520,32 @@ import { RouterLink } from 'vue-router'
         this.connection.on("ReceiveLastMessagePrivate" + receiverId, (message) => {
           if(message && message.sendAt){
              const elapsedTime = this.calculateElapsedTime(message.sendAt);
-            let messageContent = message.content;
+            // let messageContent = message.content;
 
-            const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+            // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-            // Kiểm tra nếu tin nhắn chứa hình ảnh
-            const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-            let match;
-            let lastIndex = 0;
+            // // Kiểm tra nếu tin nhắn chứa hình ảnh
+            // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+            // let match;
+            // let lastIndex = 0;
 
-            while ((match = imageRegex.exec(messageContent)) !== null) {
-              // Thêm văn bản trước hình ảnh (nếu có)
-              if (match.index > lastIndex) {
-                messageElements.push(messageContent.substring(lastIndex, match.index));
-              }
-              // Thêm hình ảnh
-              messageElements.push({ type: 'emoji', src: match[1] });
-              lastIndex = imageRegex.lastIndex;
-            }
-            // Thêm văn bản cuối cùng (nếu có)
-            if (lastIndex < messageContent.length) {
-              messageElements.push(messageContent.substring(lastIndex));
-            }
+            // while ((match = imageRegex.exec(messageContent)) !== null) {
+            //   // Thêm văn bản trước hình ảnh (nếu có)
+            //   if (match.index > lastIndex) {
+            //     messageElements.push(messageContent.substring(lastIndex, match.index));
+            //   }
+            //   // Thêm hình ảnh
+            //   messageElements.push({ type: 'emoji', src: match[1] });
+            //   lastIndex = imageRegex.lastIndex;
+            // }
+            // // Thêm văn bản cuối cùng (nếu có)
+            // if (lastIndex < messageContent.length) {
+            //   messageElements.push(messageContent.substring(lastIndex));
+            // }
 
             this.lastMessagePrivate[receiverId] = {
               fromUser: message.fromUser,
-              content: messageElements,
+              content: message.content,
               sentAt: elapsedTime,
               // time: message.sendAt
             };
@@ -638,3 +647,10 @@ nav a:first-of-type {
   } */
 }
 </style>
+
+
+<!-- <style>
+.post-image {
+    width: 10px !important;
+}
+</style> -->

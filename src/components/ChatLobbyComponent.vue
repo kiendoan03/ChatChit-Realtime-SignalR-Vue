@@ -72,27 +72,10 @@ library.add(fas)
             <font-awesome-icon :icon="['fas', 'xmark']" />
           </div>
           <div class="q-pa-md cursor-pointer" >
-            <!-- <div class="q-gutter-md row items-start">
-              <q-uploader
-                style="max-width: 300px"
-                url="https://localhost:7014/Uploads/UploadToLobby"
-                label="Restricted to images"
-                multiple
-                accept=".jpg, image/*"
-              />
-            </div> -->
-            <!-- <q-file ref="fileInput" outlined v-model="upload" @change="handleFileSelection" @mousedown="openFileDialog">
-              <template v-slot:prepend>
-                <font-awesome-icon :icon="['fas', 'image']" />
-              </template>
-            </q-file> -->
             <div>
-              <!-- <label for="fileInput"> -->
                 <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
                   <font-awesome-icon :icon="['fas', 'image']" @click="openFileDialog" />
                 </q-avatar>
-              <!-- </label> -->
-              
             </div>
           </div>
         </template>
@@ -146,8 +129,7 @@ export default {
       } else {
         console.log("File input not found");
       }
-  },
-    
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.scrollContainer;
@@ -357,7 +339,7 @@ export default {
         .catch((error) => {
           console.error("Error getting last message in lobby: ", error);
         });
-      },
+      },  
     getUser() {
       if (localStorage.getItem('token')){
         this.user = localStorage.getItem('displayName');
