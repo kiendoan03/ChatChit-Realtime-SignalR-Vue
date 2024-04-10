@@ -36,9 +36,6 @@
         <div>
           <q-btn label="Login" type="submit" color="primary"/>
           <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          <!-- <RouterLink to="/register" class="q-ml-sm text-red" style="font-size:small">
-            You don't have an account? Register here
-          </RouterLink> -->
           <q-btn label=" You don't have an account? Register here" @click="dialog = true"  flat style="font-size:small" color="red"  />
         </div>
       </q-form>
@@ -71,10 +68,6 @@
               </q-btn>
             </q-bar>
 
-            <!-- <q-card-section>
-              <div class="text-h6 text-dark">Register</div>
-            </q-card-section> -->
-
             <q-card-section class="q-pt-none resgister-max" v-if="maximizedToggle" >
               <RegisterView />
             </q-card-section>
@@ -89,7 +82,6 @@
   
   <script>
   import axios from 'axios';
-// import { RouterLink } from 'vue-router';
   export default {
     data() {
       return {

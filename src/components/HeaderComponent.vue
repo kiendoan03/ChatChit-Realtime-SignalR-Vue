@@ -45,7 +45,6 @@
                       </q-card>
                     </q-dialog>
               </div>
-              <!-- <div class="q-pa-md q-gutter-sm "> -->
                     <q-dialog v-model="dialogSignOut" :backdrop-filter="backdropFilter">
                       <q-card>
                         <q-card-section class="row items-center q-pb-none text-h6 text-red">
@@ -68,7 +67,6 @@
                         </q-card-actions>
                       </q-card>
                     </q-dialog>
-                <!-- </div> -->
             </div>
           </q-toolbar>
         </q-header>
@@ -99,10 +97,6 @@
                                   <span v-else class="text-secondary">
                                     You:
                                   </span>
-                                   <!-- <template v-for="(element, index) in lastMessageLobby.content" >
-                                    <span v-if="typeof element === 'string'">{{ element }}</span>
-                                    <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                  </template> -->
                                   <span>
                                     <span v-html="this.lastMessageLobby.content" ></span>
                                   </span>
@@ -141,10 +135,6 @@
                                     <span class="text-secondary" v-else >
                                       You:
                                     </span>
-                                    <!-- <template v-for="(element, index) in lastMessageRoom[room.id].content">
-                                        <span v-if="typeof element === 'string'">{{ element }}</span>
-                                        <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                    </template> -->
                                     <span>
                                       <span v-html="this.lastMessageRoom[room.id].content" ></span>
                                     </span>
@@ -190,10 +180,6 @@
                                     <span class="text-secondary" v-else-if="lastMessagePrivate[users.id].fromUser != ''" >
                                       You:
                                     </span>
-                                    <!-- <template v-for="(element, index) in lastMessagePrivate[users.id].content">
-                                        <span v-if="typeof element === 'string'">{{ element }}</span>
-                                        <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-                                    </template> -->
                                     <span>
                                       <span v-html="this.lastMessagePrivate[users.id].content" ></span>
                                     </span>
@@ -292,7 +278,6 @@ import { RouterLink } from 'vue-router'
           this.getLastMessagePrivate(this.user.id, user.id);
           this.listenForLastMessagePrivate(user.id);
         });
-        // this.sortConversationsByTime();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
@@ -413,19 +398,19 @@ import { RouterLink } from 'vue-router'
         })
       },
       openDialog(filter) {
-        if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+        if (typeof filter === 'string') { 
           this.backdropFilter = filter;
           this.dialog = true;
         } else {
-          console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+          console.error('Invalid backdrop filter value'); 
         }
       },
       openDialogSignOut(filter) {
-        if (typeof filter === 'string') { // Kiểm tra nếu filter là một chuỗi
+        if (typeof filter === 'string') { 
           this.backdropFilter = filter;
           this.dialogSignOut = true;
         } else {
-          console.error('Invalid backdrop filter value'); // In ra thông báo lỗi nếu filter không phải là chuỗi
+          console.error('Invalid backdrop filter value'); 
         }
       },
       getLastMessageInLobby(){
@@ -437,34 +422,11 @@ import { RouterLink } from 'vue-router'
       listenForLastMessageInLobby(){
         this.connection.on("ReceiveLastMessageInLobby", (message) => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-          // let messageContent = message.content;
-
-          // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-          // // Kiểm tra nếu tin nhắn chứa hình ảnh
-          // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-          // let match;
-          // let lastIndex = 0;
-
-          // while ((match = imageRegex.exec(messageContent)) !== null) {
-          //   // Thêm văn bản trước hình ảnh (nếu có)
-          //   if (match.index > lastIndex) {
-          //     messageElements.push(messageContent.substring(lastIndex, match.index));
-          //   }
-          //   // Thêm hình ảnh
-          //   messageElements.push({ type: 'emoji', src: match[1] });
-          //   lastIndex = imageRegex.lastIndex;
-          // }
-          // // Thêm văn bản cuối cùng (nếu có)
-          // if (lastIndex < messageContent.length) {
-          //   messageElements.push(messageContent.substring(lastIndex));
-          // }
 
           this.lastMessageLobby = {
             fromUser: message.fromUser,
             content: message.content,
             sentAt: elapsedTime,
-            // time: message.sendAt
           };
 
         });
@@ -478,35 +440,12 @@ import { RouterLink } from 'vue-router'
       listenForLastMessageInRoom(roomId){
         this.connection.on("ReceiveLastMessageInRoom" +  roomId, (message) => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-          // let messageContent = message.content;
-
-          // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-          // // Kiểm tra nếu tin nhắn chứa hình ảnh
-          // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-          // let match;
-          // let lastIndex = 0;
-
-          // while ((match = imageRegex.exec(messageContent)) !== null) {
-          //   // Thêm văn bản trước hình ảnh (nếu có)
-          //   if (match.index > lastIndex) {
-          //     messageElements.push(messageContent.substring(lastIndex, match.index));
-          //   }
-          //   // Thêm hình ảnh
-          //   messageElements.push({ type: 'emoji', src: match[1] });
-          //   lastIndex = imageRegex.lastIndex;
-          // }
-          // // Thêm văn bản cuối cùng (nếu có)
-          // if (lastIndex < messageContent.length) {
-          //   messageElements.push(messageContent.substring(lastIndex));
-          // }
 
             this.lastMessageRoom[roomId] = {
             fromUser: message.fromUser,
             content: message.content,
             sentAt: elapsedTime,
             roomId: message.room,
-            // time: message.sendAt
           };
         });
       },
@@ -520,28 +459,6 @@ import { RouterLink } from 'vue-router'
         this.connection.on("ReceiveLastMessagePrivate" + receiverId, (message) => {
           if(message && message.sendAt){
              const elapsedTime = this.calculateElapsedTime(message.sendAt);
-            // let messageContent = message.content;
-
-            // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-            // // Kiểm tra nếu tin nhắn chứa hình ảnh
-            // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-            // let match;
-            // let lastIndex = 0;
-
-            // while ((match = imageRegex.exec(messageContent)) !== null) {
-            //   // Thêm văn bản trước hình ảnh (nếu có)
-            //   if (match.index > lastIndex) {
-            //     messageElements.push(messageContent.substring(lastIndex, match.index));
-            //   }
-            //   // Thêm hình ảnh
-            //   messageElements.push({ type: 'emoji', src: match[1] });
-            //   lastIndex = imageRegex.lastIndex;
-            // }
-            // // Thêm văn bản cuối cùng (nếu có)
-            // if (lastIndex < messageContent.length) {
-            //   messageElements.push(messageContent.substring(lastIndex));
-            // }
 
             this.lastMessagePrivate[receiverId] = {
               fromUser: message.fromUser,
@@ -554,29 +471,10 @@ import { RouterLink } from 'vue-router'
               fromUser: '',
               content: '',
               sentAt: '',
-              // time: ''
             };
           }
         });
       },
-      // sortConversationsByTime() {
-      //   this.rooms.sort((a, b) => {
-      //       if (this.lastMessageRoom[a.id] && this.lastMessageRoom[b.id]) {
-      //         return new Date(this.lastMessageRoom[b.id].time) - new Date(this.lastMessageRoom[a.id].time);
-      //       } else {
-      //         return 0; // Không có tin nhắn cuối cùng, không có sắp xếp
-      //       }
-      //     });
-
-      //     // Sắp xếp danh sách người dùng
-      //     this.allUser.sort((a, b) => {
-      //       if (this.lastMessagePrivate[a.id] && this.lastMessagePrivate[b.id]) {
-      //         return new Date(this.lastMessagePrivate[b.id].time) - new Date(this.lastMessagePrivate[a.id].time);
-      //       } else {
-      //         return 0; // Không có tin nhắn cuối cùng, không có sắp xếp
-      //       }
-      //     });
-      //   },
       }
   }         
 </script>
@@ -622,29 +520,8 @@ nav a:first-of-type {
 @media (min-width: 1024px) {
   header {
     display: flex;
-    /* place-items: center; */
     padding-right: calc(var(--section-gap) / 2);
   }
- 
-
-  /* .logo {
-    margin: 0 2rem 0 0;
-  } */
-
-  /* header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  } */
-
-  /* nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  } */
 }
 </style>
 

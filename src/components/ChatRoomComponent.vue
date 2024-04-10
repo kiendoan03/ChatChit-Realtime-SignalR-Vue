@@ -1,7 +1,6 @@
 <script setup>
 
 import { QChatMessage } from 'quasar'
-import { QIcon } from 'quasar'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -28,13 +27,8 @@ library.add(fas)
           </template>
         <div>
           <span v-html="message.content" ></span>
-          <!-- <template v-for="(element, index) in message.content">
-            <span v-if="typeof element === 'string'">{{ element }}</span>
-            <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template> -->
         </div>
       </q-chat-message>
-       <!--  -->
       <q-chat-message v-else
         :name="[message.sender]"
         :size = "messageSize[index]"
@@ -46,10 +40,6 @@ library.add(fas)
           </q-avatar>
       </template>
         <div>
-          <!-- <template v-for="(element, index) in message.content">
-            <span v-if="typeof element === 'string'">{{ element }}</span>
-            <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template> -->
           <span v-html="message.content" ></span>
         </div>
       </q-chat-message>
@@ -57,7 +47,6 @@ library.add(fas)
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
-    <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessageToRoom(this.room.id )" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar color="pink-3" text-color="white">
@@ -199,28 +188,7 @@ export default {
               // Kiểm tra xem tin nhắn đã tồn tại trong mảng hay chưa trước khi thêm vào
               if (!this.messages.some(msg => msg.sender === message.fromUser && msg.content === message.content && msg.id === message.id)) {
                 const elapsedTime = this.calculateElapsedTime(message.sendAt);
-                // let messageContent = message.content;
 
-                // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-                // // Kiểm tra nếu tin nhắn chứa hình ảnh
-                // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-                // let match;
-                // let lastIndex = 0;
-
-                // while ((match = imageRegex.exec(messageContent)) !== null) {
-                //   // Thêm văn bản trước hình ảnh (nếu có)
-                //   if (match.index > lastIndex) {
-                //     messageElements.push(messageContent.substring(lastIndex, match.index));
-                //   }
-                //   // Thêm hình ảnh
-                //   messageElements.push({ type: 'emoji', src: match[1] });
-                //   lastIndex = imageRegex.lastIndex;
-                // }
-                // // Thêm văn bản cuối cùng (nếu có)
-                // if (lastIndex < messageContent.length) {
-                //   messageElements.push(messageContent.substring(lastIndex));
-                // }
                 this.messages.push({ sender: message.fromUser, content: message.content, id: message.id, sendAt: elapsedTime});
                 console.log(message);
                 this.scrollToBottom();
@@ -245,7 +213,6 @@ export default {
         console.log(response.data);
         this.text = response.data;
         console.log(this.text);
-        // this.sendMessage();
         this.text = '';
         this.listenForMessages(roomId);
         this.scrollToBottom();
@@ -282,29 +249,6 @@ export default {
         this.connection.on("ReceiveChatHistoryRoom", (messages) => {
             messages.forEach(message => {
               const elapsedTime = this.calculateElapsedTime(message.sendAt);
-              // let messageContent = message.content;
-
-              // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-              // // Kiểm tra nếu tin nhắn chứa hình ảnh
-              // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-              // let match;
-              // let lastIndex = 0;
-
-              // while ((match = imageRegex.exec(messageContent)) !== null) {
-              //   // Thêm văn bản trước hình ảnh (nếu có)
-              //   if (match.index > lastIndex) {
-              //     messageElements.push(messageContent.substring(lastIndex, match.index));
-              //   }
-              //   // Thêm hình ảnh
-              //   messageElements.push({ type: 'emoji', src: match[1] });
-              //   lastIndex = imageRegex.lastIndex;
-              // }
-
-              // // Thêm văn bản cuối cùng (nếu có)
-              // if (lastIndex < messageContent.length) {
-              //   messageElements.push(messageContent.substring(lastIndex));
-              // }
 
               this.messages.push({
                 sender: message.fromUser,
@@ -313,7 +257,7 @@ export default {
                 sendAt: elapsedTime
               });
               this.messages.sort((a, b) => {
-                  return a.id - b.id; // Sắp xếp theo thời gian gửi tăng dần
+                  return a.id - b.id; 
               });
             });
             this.scrollToBottom();
@@ -331,9 +275,8 @@ export default {
       this.messages.forEach(message => {
         let size = 1;
         
-        // Kiểm tra nếu content là chuỗi string
         if (typeof message.content === 'string') {
-          const content = message.content.trim(); // Loại bỏ khoảng trắng thừa
+          const content = message.content.trim(); 
          
           const hasImgTag = /<img.*?>/.test(message.content);
           const hasATag = /<a.*?>/.test(message.content);

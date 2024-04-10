@@ -27,10 +27,6 @@ library.add(fas)
             </q-avatar>
           </template>
         <div>
-          <!-- <template v-for="(element, index) in message.content">
-            <span v-if="typeof element === 'string'">{{ element }}</span>
-            <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template> -->
           <span v-html="message.content" ></span>
         </div>
       </q-chat-message>
@@ -45,17 +41,12 @@ library.add(fas)
             </q-avatar>
         </template>
         <div>
-          <!-- <template v-for="(element, index) in message.content">
-            <span v-if="typeof element === 'string'">{{ element }}</span>
-            <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template> -->
           <span v-html="message.content" ></span>
         </div>
       </q-chat-message>
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
-    <!-- <input type="text" v-model="user" placeholder="Type your name..."> -->
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessagePrivate" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar color="pink-3" text-color="white">
@@ -114,8 +105,6 @@ export default {
   },
   mounted() {
     this.getUser();
-    // this.room.id = this.$route.params.id;
-    // this.getHistoryChatPrivate(this.userId, this.$route.params.id);
   },
   watch: {
             '$route.params.id': function(newId) {
@@ -155,36 +144,9 @@ export default {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
-    // listonForConnet(){
-    //   this.connection.on("ReceiveMessageConnect", (message) => {
-    //     console.log(message);
-    //   });
-    // },
     listenForMessages() {
       this.connection.on("ReceiveMessagePrivate", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
-        // let messageContent = message.content;
-
-        // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-        // // Kiểm tra nếu tin nhắn chứa hình ảnh
-        // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-        // let match;
-        // let lastIndex = 0;
-
-        // while ((match = imageRegex.exec(messageContent)) !== null) {
-        //   // Thêm văn bản trước hình ảnh (nếu có)
-        //   if (match.index > lastIndex) {
-        //     messageElements.push(messageContent.substring(lastIndex, match.index));
-        //   }
-        //   // Thêm hình ảnh
-        //   messageElements.push({ type: 'emoji', src: match[1] });
-        //   lastIndex = imageRegex.lastIndex;
-        // }
-        // // Thêm văn bản cuối cùng (nếu có)
-        // if (lastIndex < messageContent.length) {
-        //   messageElements.push(messageContent.substring(lastIndex));
-        // }
         this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
         console.log(message);
         this.scrollToBottom();
@@ -194,28 +156,6 @@ export default {
     listenForReceive(receiveId){
         this.connection.on("ReceiveMessagePrivate" + receiveId, (message) => {
             const elapsedTime = this.calculateElapsedTime(message.sendAt);
-            // let messageContent = message.content;
-
-            // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-            // // Kiểm tra nếu tin nhắn chứa hình ảnh
-            // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-            // let match;
-            // let lastIndex = 0;
-
-            // while ((match = imageRegex.exec(messageContent)) !== null) {
-            //   // Thêm văn bản trước hình ảnh (nếu có)
-            //   if (match.index > lastIndex) {
-            //     messageElements.push(messageContent.substring(lastIndex, match.index));
-            //   }
-            //   // Thêm hình ảnh
-            //   messageElements.push({ type: 'emoji', src: match[1] });
-            //   lastIndex = imageRegex.lastIndex;
-            // }
-            // // Thêm văn bản cuối cùng (nếu có)
-            // if (lastIndex < messageContent.length) {
-            //   messageElements.push(messageContent.substring(lastIndex));
-            // }
             this.messages.push( {sender:message.fromUser, content:message.content, sendAt: elapsedTime} );
             console.log(this.messages);
             this.scrollToBottom();
@@ -237,7 +177,6 @@ export default {
         console.log(response.data);
         this.text = response.data;
         console.log(this.text);
-        // this.sendMessage();
         this.text = '';
         this.listenForMessages();
         this.scrollToBottom();
@@ -336,32 +275,8 @@ export default {
     },
     listenForHistoryChatPrivate(){
         this.connection.on("ReceiveChatHistoryPrivate", (messages) => {
-            // Cập nhật dữ liệu lịch sử chat
             messages.forEach(message => {
                 const elapsedTime = this.calculateElapsedTime(message.sendAt);
-                // let messageContent = message.content;
-
-                // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
-
-                // // Kiểm tra nếu tin nhắn chứa hình ảnh
-                // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-                // let match;
-                // let lastIndex = 0;
-
-                // while ((match = imageRegex.exec(messageContent)) !== null) {
-                //   // Thêm văn bản trước hình ảnh (nếu có)
-                //   if (match.index > lastIndex) {
-                //     messageElements.push(messageContent.substring(lastIndex, match.index));
-                //   }
-                //   // Thêm hình ảnh
-                //   messageElements.push({ type: 'emoji', src: match[1] });
-                //   lastIndex = imageRegex.lastIndex;
-                // }
-
-                // // Thêm văn bản cuối cùng (nếu có)
-                // if (lastIndex < messageContent.length) {
-                //   messageElements.push(messageContent.substring(lastIndex));
-                // }
 
                 this.messages.push( {sender:message.fromUser, content: message.content, sendAt: elapsedTime});
             });

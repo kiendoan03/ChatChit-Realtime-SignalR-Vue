@@ -1,7 +1,6 @@
 <template>
    
     <div class="q-pa-md" style="width: 50vh;">
-         <!-- <h3 class="text-dark">Register</h3> -->
       <q-form
         @submit="onSubmit"
         @reset="onReset"

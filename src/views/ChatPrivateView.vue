@@ -95,6 +95,6 @@ import * as signalR from "@aspnet/signalr";
 </script>
 <style>
   .bg-selected {
-    background-color: lightblue; /* Đổi màu nền khi được chọn */
+    background-color: lightblue;
   }
 </style>
