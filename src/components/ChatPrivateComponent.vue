@@ -27,10 +27,11 @@ library.add(fas)
             </q-avatar>
           </template>
         <div>
-          <template v-for="(element, index) in message.content">
+          <!-- <template v-for="(element, index) in message.content">
             <span v-if="typeof element === 'string'">{{ element }}</span>
             <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template>
+          </template> -->
+          <span v-html="message.content" ></span>
         </div>
       </q-chat-message>
       <q-chat-message v-else
@@ -44,10 +45,11 @@ library.add(fas)
             </q-avatar>
         </template>
         <div>
-          <template v-for="(element, index) in message.content">
+          <!-- <template v-for="(element, index) in message.content">
             <span v-if="typeof element === 'string'">{{ element }}</span>
             <img v-else-if="element.type === 'emoji'" :src="element.src" style="margin-left: 0.5vh; margin-right: 0.5vh;" class="emoji">
-          </template>
+          </template> -->
+          <span v-html="message.content" ></span>
         </div>
       </q-chat-message>
     </div>
@@ -65,6 +67,13 @@ library.add(fas)
           <div v-if="text !== ''" name="close" @click="text = ''" class="cursor-pointer">
             <font-awesome-icon :icon="['fas', 'xmark']" />
           </div>
+          <div class="q-pa-md cursor-pointer" >
+            <div>
+                <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
+                  <font-awesome-icon :icon="['fas', 'image']" @click="openFileDialog" />
+                </q-avatar>
+            </div>
+          </div>
         </template>
 
         <template v-slot:after>
@@ -73,15 +82,14 @@ library.add(fas)
           </div>
         </template>
     </q-input>
-    <!-- <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type your message..."> -->
-    <!-- <button type="button" @click="sendMessage">Send</button> -->
+    <input ref="fileInput" id="fileInput" type="file" style="display: none" @change="handleFileSelection">
   </div>
   
 </template>
 
 <script>
   import * as signalR from "@aspnet/signalr";
-
+  import axios from 'axios';
 export default {
     name: 'ChatPrivateComponent',
   data() {
@@ -93,6 +101,11 @@ export default {
       userId: "",
       now: Date.now(),
       messageSize: [], 
+      uploadFile:{
+        file: '',
+        fromUserId:'',
+        toUserId: '',
+      }
     };
    
   },
@@ -111,6 +124,15 @@ export default {
             },
         },
   methods: {
+    openFileDialog() {
+      console.log("Opening file dialog");
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.click();
+      } else {
+        console.log("File input not found");
+      }
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.scrollContainer;
@@ -128,36 +150,42 @@ export default {
         this.listenForReceive(this.userId);
         this.getHistoryChatPrivate(this.userId, this.$route.params.id);
         this.listenForHistoryChatPrivate();
+        // this.listonForConnet();
       }).catch((error) => {
         console.error("Error connecting to SignalR Hub: ", error);
       });
     },
+    // listonForConnet(){
+    //   this.connection.on("ReceiveMessageConnect", (message) => {
+    //     console.log(message);
+    //   });
+    // },
     listenForMessages() {
       this.connection.on("ReceiveMessagePrivate", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
-        let messageContent = message.content;
+        // let messageContent = message.content;
 
-        const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+        // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-        // Kiểm tra nếu tin nhắn chứa hình ảnh
-        const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-        let match;
-        let lastIndex = 0;
+        // // Kiểm tra nếu tin nhắn chứa hình ảnh
+        // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+        // let match;
+        // let lastIndex = 0;
 
-        while ((match = imageRegex.exec(messageContent)) !== null) {
-          // Thêm văn bản trước hình ảnh (nếu có)
-          if (match.index > lastIndex) {
-            messageElements.push(messageContent.substring(lastIndex, match.index));
-          }
-          // Thêm hình ảnh
-          messageElements.push({ type: 'emoji', src: match[1] });
-          lastIndex = imageRegex.lastIndex;
-        }
-        // Thêm văn bản cuối cùng (nếu có)
-        if (lastIndex < messageContent.length) {
-          messageElements.push(messageContent.substring(lastIndex));
-        }
-        this.messages.push( {sender:message.fromUser,content:messageElements, sendAt: elapsedTime} );
+        // while ((match = imageRegex.exec(messageContent)) !== null) {
+        //   // Thêm văn bản trước hình ảnh (nếu có)
+        //   if (match.index > lastIndex) {
+        //     messageElements.push(messageContent.substring(lastIndex, match.index));
+        //   }
+        //   // Thêm hình ảnh
+        //   messageElements.push({ type: 'emoji', src: match[1] });
+        //   lastIndex = imageRegex.lastIndex;
+        // }
+        // // Thêm văn bản cuối cùng (nếu có)
+        // if (lastIndex < messageContent.length) {
+        //   messageElements.push(messageContent.substring(lastIndex));
+        // }
+        this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
         console.log(message);
         this.scrollToBottom();
         this.calculateMessageSize();
@@ -166,33 +194,56 @@ export default {
     listenForReceive(receiveId){
         this.connection.on("ReceiveMessagePrivate" + receiveId, (message) => {
             const elapsedTime = this.calculateElapsedTime(message.sendAt);
-            let messageContent = message.content;
+            // let messageContent = message.content;
 
-            const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+            // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-            // Kiểm tra nếu tin nhắn chứa hình ảnh
-            const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-            let match;
-            let lastIndex = 0;
+            // // Kiểm tra nếu tin nhắn chứa hình ảnh
+            // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+            // let match;
+            // let lastIndex = 0;
 
-            while ((match = imageRegex.exec(messageContent)) !== null) {
-              // Thêm văn bản trước hình ảnh (nếu có)
-              if (match.index > lastIndex) {
-                messageElements.push(messageContent.substring(lastIndex, match.index));
-              }
-              // Thêm hình ảnh
-              messageElements.push({ type: 'emoji', src: match[1] });
-              lastIndex = imageRegex.lastIndex;
-            }
-            // Thêm văn bản cuối cùng (nếu có)
-            if (lastIndex < messageContent.length) {
-              messageElements.push(messageContent.substring(lastIndex));
-            }
-            this.messages.push( {sender:message.fromUser, content:messageElements, sendAt: elapsedTime} );
+            // while ((match = imageRegex.exec(messageContent)) !== null) {
+            //   // Thêm văn bản trước hình ảnh (nếu có)
+            //   if (match.index > lastIndex) {
+            //     messageElements.push(messageContent.substring(lastIndex, match.index));
+            //   }
+            //   // Thêm hình ảnh
+            //   messageElements.push({ type: 'emoji', src: match[1] });
+            //   lastIndex = imageRegex.lastIndex;
+            // }
+            // // Thêm văn bản cuối cùng (nếu có)
+            // if (lastIndex < messageContent.length) {
+            //   messageElements.push(messageContent.substring(lastIndex));
+            // }
+            this.messages.push( {sender:message.fromUser, content:message.content, sendAt: elapsedTime} );
             console.log(this.messages);
             this.scrollToBottom();
             this.calculateMessageSize();
         });
+    },
+    handleFileSelection() {
+      // const selectedFile = event.target.files[0];
+      const selectedFile = this.$refs.fileInput.files[0];
+      console.log(selectedFile);
+      this.uploadFile.file = selectedFile;
+      this.uploadFile.fromUserId = this.userId;
+      this.uploadFile.toUserId = this.$route.params.id;
+      axios.post('https://localhost:7014/api/Uploads/UploadToUser', this.uploadFile, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        console.log(response.data);
+        this.text = response.data;
+        console.log(this.text);
+        // this.sendMessage();
+        this.text = '';
+        this.listenForMessages();
+        this.scrollToBottom();
+      }).catch(error => {
+        console.error('Error uploading file: ', error);
+      });
     },
     sendMessagePrivate() {
         try {
@@ -231,23 +282,49 @@ export default {
         return avatar.toUpperCase();
     },
     calculateMessageSize() {
+      // this.messages.forEach(message => {
+      //   let size = 1; 
+      //   message.content.forEach(item => {
+      //     if (typeof item === 'string') {
+      //       const itemLength = item.length;
+      //       if (itemLength < 50) {
+      //         size = 1.5; 
+      //       } else if (itemLength < 100) {
+      //         size = 3; 
+      //       } else {
+      //         size = 5; 
+      //       }
+      //     } else if (item && item.type === 'emoji') {
+      //         size = 1.5;
+      //     }
+      //   });
+      //   // Thêm kích thước vào mảng messageSize
+      //   this.messageSize.push(size);
+      // });
       this.messages.forEach(message => {
-        let size = 1; 
-        message.content.forEach(item => {
-          if (typeof item === 'string') {
-            const itemLength = item.length;
-            if (itemLength < 50) {
-              size = 1.5; 
-            } else if (itemLength < 100) {
-              size = 3; 
-            } else {
-              size = 5; 
-            }
-          } else if (item && item.type === 'emoji') {
+        let size = 1;
+        
+        // Kiểm tra nếu content là chuỗi string
+        if (typeof message.content === 'string') {
+          const content = message.content.trim(); // Loại bỏ khoảng trắng thừa
+         
+          const hasImgTag = /<img.*?>/.test(message.content);
+          const hasATag = /<a.*?>/.test(message.content);
+          
+          if (hasImgTag) {
+            size = 1.5; 
+          }else if(hasATag){
+            size = 4;
+          } else if (!hasATag && !hasImgTag) {
+            if (content.length < 50) {
               size = 1.5;
+            } else if (content.length < 100) {
+              size = 3;
+            } else {
+              size = 5;
+            }
           }
-        });
-        // Thêm kích thước vào mảng messageSize
+        }
         this.messageSize.push(size);
       });
     },
@@ -262,31 +339,31 @@ export default {
             // Cập nhật dữ liệu lịch sử chat
             messages.forEach(message => {
                 const elapsedTime = this.calculateElapsedTime(message.sendAt);
-                let messageContent = message.content;
+                // let messageContent = message.content;
 
-                const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
+                // const messageElements = []; // Mảng để chứa các phần tử của tin nhắn
 
-                // Kiểm tra nếu tin nhắn chứa hình ảnh
-                const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
-                let match;
-                let lastIndex = 0;
+                // // Kiểm tra nếu tin nhắn chứa hình ảnh
+                // const imageRegex = /<img.*?class="emoji".*?src="(.*?)".*?>/g;
+                // let match;
+                // let lastIndex = 0;
 
-                while ((match = imageRegex.exec(messageContent)) !== null) {
-                  // Thêm văn bản trước hình ảnh (nếu có)
-                  if (match.index > lastIndex) {
-                    messageElements.push(messageContent.substring(lastIndex, match.index));
-                  }
-                  // Thêm hình ảnh
-                  messageElements.push({ type: 'emoji', src: match[1] });
-                  lastIndex = imageRegex.lastIndex;
-                }
+                // while ((match = imageRegex.exec(messageContent)) !== null) {
+                //   // Thêm văn bản trước hình ảnh (nếu có)
+                //   if (match.index > lastIndex) {
+                //     messageElements.push(messageContent.substring(lastIndex, match.index));
+                //   }
+                //   // Thêm hình ảnh
+                //   messageElements.push({ type: 'emoji', src: match[1] });
+                //   lastIndex = imageRegex.lastIndex;
+                // }
 
-                // Thêm văn bản cuối cùng (nếu có)
-                if (lastIndex < messageContent.length) {
-                  messageElements.push(messageContent.substring(lastIndex));
-                }
+                // // Thêm văn bản cuối cùng (nếu có)
+                // if (lastIndex < messageContent.length) {
+                //   messageElements.push(messageContent.substring(lastIndex));
+                // }
 
-                this.messages.push( {sender:message.fromUser, content: messageElements, sendAt: elapsedTime});
+                this.messages.push( {sender:message.fromUser, content: message.content, sendAt: elapsedTime});
             });
             this.scrollToBottom();
             this.calculateMessageSize();
