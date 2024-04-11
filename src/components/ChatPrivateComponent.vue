@@ -32,7 +32,7 @@ library.add(fas)
           <div v-else>
             <div v-if="linkPreviews[message.content]">
                 <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
-                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax;" v-if="linkPreviews[message.content].image" />
+                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
                   <div>{{ linkPreviews[message.content].title }}</div>
                 </a>
             </div>
@@ -57,7 +57,7 @@ library.add(fas)
           <div v-else>
             <div v-if="linkPreviews[message.content]">
                 <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
-                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax;" v-if="linkPreviews[message.content].image" />
+                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
                   <div>{{ linkPreviews[message.content].title }}</div>
                 </a>
             </div>
