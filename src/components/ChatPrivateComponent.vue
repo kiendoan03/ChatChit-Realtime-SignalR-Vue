@@ -26,9 +26,20 @@ library.add(fas)
               {{ generateAvatarFromName(this.user) }}
             </q-avatar>
           </template>
-        <div>
-          <span v-html="message.content" ></span>
-        </div>
+          <div v-if="!message.content.startsWith('http')" >
+            <span v-html="message.content" ></span>
+          </div>
+          <div v-else>
+            <div v-if="linkPreviews[message.content]">
+                <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
+                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax;" v-if="linkPreviews[message.content].image" />
+                  <div>{{ linkPreviews[message.content].title }}</div>
+                </a>
+            </div>
+              <div v-else>
+                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+              </div>
+          </div>
       </q-chat-message>
       <q-chat-message v-else
         :name="[message.sender]"
@@ -40,9 +51,20 @@ library.add(fas)
               {{ generateAvatarFromName(message.sender) }}
             </q-avatar>
         </template>
-        <div>
-          <span v-html="message.content" ></span>
-        </div>
+        <div v-if="!message.content.startsWith('http')" >
+            <span v-html="message.content" ></span>
+          </div>
+          <div v-else>
+            <div v-if="linkPreviews[message.content]">
+                <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
+                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax;" v-if="linkPreviews[message.content].image" />
+                  <div>{{ linkPreviews[message.content].title }}</div>
+                </a>
+            </div>
+              <div v-else>
+                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+              </div>
+          </div>
       </q-chat-message>
     </div>
   </div>
@@ -107,7 +129,8 @@ export default {
         fromUserId:'',
         toUserId: '',
       },
-      pastedImage: null
+      pastedImage: null,
+      linkPreviews: {}
     };
    
   },
@@ -154,6 +177,11 @@ export default {
           reader.readAsDataURL(blob);
           break; // Chỉ xử lý hình ảnh đầu tiên nếu có nhiều hình ảnh được paste
         }
+        else if (item.type.indexOf('text') !== -1) {
+          // Nếu phần tử được paste là dữ liệu văn bản, kiểm tra xem nó có phải là một link không
+          const text = clipboardData.getData('text/plain');
+          this.text = text;
+        }
       }
     },
     openFileDialog() {
@@ -190,6 +218,11 @@ export default {
     listenForMessages() {
       this.connection.on("ReceiveMessagePrivate", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
+        if(message.content.startsWith('http')){
+                  // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+                  this.fetchLinkPreview(message.content);
+                  console.log(message.content);
+                }
         this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
         console.log(message);
         this.scrollToBottom();
@@ -199,6 +232,11 @@ export default {
     listenForReceive(receiveId){
         this.connection.on("ReceiveMessagePrivate" + receiveId, (message) => {
             const elapsedTime = this.calculateElapsedTime(message.sendAt);
+            if(message.content.startsWith('http')){
+                  // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+                  this.fetchLinkPreview(message.content);
+                  console.log(message.content);
+                }
             this.messages.push( {sender:message.fromUser, content:message.content, sendAt: elapsedTime} );
             console.log(this.messages);
             this.scrollToBottom();
@@ -226,6 +264,22 @@ export default {
       }).catch(error => {
         console.error('Error uploading file: ', error);
       });
+    },
+    fetchLinkPreview(link) {
+      try {
+        axios.get(`https://localhost:7014/Messages?url=${link}`)
+        .then(response => {
+          console.log(response.data);
+          this.linkPreviews[link] = response.data;
+          console.log(this.linkPreviews[link]);
+        }).catch(error => {
+          console.error('Error fetching link preview: ', error);
+        });
+       
+      } catch (error) {
+        console.error("Error fetching link preview: ", error);
+        return null;
+      }
     },
     sendMessagePrivate() {
         try {
@@ -328,13 +382,18 @@ export default {
           }else if(hasATag){
             size = 4;
           } else if (!hasATag && !hasImgTag) {
-            if (content.length < 50) {
+            if(content.startsWith('http')){
+              size = 4;
+            }
+            else {
+              if (content.length < 50) {
               size = 1.5;
             } else if (content.length < 100) {
               size = 3;
             } else {
               size = 5;
             }
+          }
           }
         }
         this.messageSize.push(size);
@@ -350,7 +409,11 @@ export default {
         this.connection.on("ReceiveChatHistoryPrivate", (messages) => {
             messages.forEach(message => {
                 const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
+                if(message.content.startsWith('http')){
+                  // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+                  this.fetchLinkPreview(message.content);
+                  console.log(message.content);
+                }
                 this.messages.push( {sender:message.fromUser, content: message.content, sendAt: elapsedTime});
             });
             this.scrollToBottom();

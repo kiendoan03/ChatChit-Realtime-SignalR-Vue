@@ -25,9 +25,20 @@ library.add(fas)
               {{ generateAvatarFromName(this.user) }}
             </q-avatar>
           </template>
-        <div>
-          <span v-html="message.content" ></span>
-        </div>
+          <div v-if="!message.content.startsWith('http')" >
+            <span v-html="message.content" ></span>
+          </div>
+          <div v-else>
+            <div v-if="linkPreviews[message.content]">
+                <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
+                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax;" v-if="linkPreviews[message.content].image" />
+                  <div>{{ linkPreviews[message.content].title }}</div>
+                </a>
+            </div>
+              <div v-else>
+                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+              </div>
+          </div>
       </q-chat-message>
       <q-chat-message v-else
         :name="[message.sender]"
@@ -39,9 +50,20 @@ library.add(fas)
             {{ generateAvatarFromName(message.sender) }}
           </q-avatar>
       </template>
-        <div>
-          <span v-html="message.content" ></span>
+      <div v-if="!message.content.startsWith('http')" >
+        <span v-html="message.content" ></span>
+      </div>
+      <div v-else>
+        <div v-if="linkPreviews[message.content]">
+            <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
         </div>
+          <div v-else>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+          </div>
+      </div>
       </q-chat-message>
 
     </div>
@@ -113,7 +135,8 @@ export default {
         fromUserId:'',
         roomId: '',
       },
-      pastedImage: null
+      pastedImage: null,
+      linkPreviews: {}
     };
    
   },
@@ -168,6 +191,27 @@ export default {
           reader.readAsDataURL(blob);
           break; // Chỉ xử lý hình ảnh đầu tiên nếu có nhiều hình ảnh được paste
         }
+        else if (item.type.indexOf('text') !== -1) {
+          // Nếu phần tử được paste là dữ liệu văn bản, kiểm tra xem nó có phải là một link không
+          const text = clipboardData.getData('text/plain');
+          this.text = text;
+        }
+      }
+    },
+    fetchLinkPreview(link) {
+      try {
+        axios.get(`https://localhost:7014/Messages?url=${link}`)
+        .then(response => {
+          console.log(response.data);
+          this.linkPreviews[link] = response.data;
+          console.log(this.linkPreviews[link]);
+        }).catch(error => {
+          console.error('Error fetching link preview: ', error);
+        });
+       
+      } catch (error) {
+        console.error("Error fetching link preview: ", error);
+        return null;
       }
     },
     openFileDialog() {
@@ -231,7 +275,11 @@ export default {
               // Kiểm tra xem tin nhắn đã tồn tại trong mảng hay chưa trước khi thêm vào
               if (!this.messages.some(msg => msg.sender === message.fromUser && msg.content === message.content && msg.id === message.id)) {
                 const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
+                if(message.content.startsWith('http')){
+                  // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+                  this.fetchLinkPreview(message.content);
+                  console.log(message.content);
+                }
                 this.messages.push({ sender: message.fromUser, content: message.content, id: message.id, sendAt: elapsedTime});
                 console.log(message);
                 this.scrollToBottom();
@@ -322,7 +370,11 @@ export default {
         this.connection.on("ReceiveChatHistoryRoom", (messages) => {
             messages.forEach(message => {
               const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
+              if(message.content.startsWith('http')){
+                // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+                this.fetchLinkPreview(message.content);
+                console.log(message.content);
+              }
               this.messages.push({
                 sender: message.fromUser,
                 content: message.content,
@@ -359,13 +411,18 @@ export default {
           }else if(hasATag){
             size = 4;
           } else if (!hasATag && !hasImgTag) {
-            if (content.length < 50) {
+            if(content.startsWith('http')){
+              size = 4;
+            }
+            else {
+              if (content.length < 50) {
               size = 1.5;
             } else if (content.length < 100) {
               size = 3;
             } else {
               size = 5;
             }
+          }
           }
         }
         this.messageSize.push(size);

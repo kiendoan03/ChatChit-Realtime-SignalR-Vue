@@ -56,10 +56,10 @@ library.add(fas)
       </div>
       <div v-else>
         <div v-if="linkPreviews[message.content]">
-            <div>{{ linkPreviews[message.content].title }}</div>
-            <!-- <div>{{ linkPreviews[message.content].description }}</div> -->
-            <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax;" v-if="linkPreviews[message.content].image" />
-            <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
         </div>
           <div v-else>
             <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
@@ -150,7 +150,7 @@ export default {
       // Lấy dữ liệu được paste
       const clipboardData = event.clipboardData || window.clipboardData;
       const pastedItems = clipboardData.items;
-      const linkRegex =  /(?:https?|ftp):\/\/[\n\S]+/g;
+      // const linkRegex =  /(?:https?|ftp):\/\/[\n\S]+/g;
       // Lặp qua các phần tử được paste
       for (let i = 0; i < pastedItems.length; i++) {
         const item = pastedItems[i];
@@ -327,6 +327,11 @@ export default {
       console.log("Listening for messages");
       this.connection.on("ReceiveMessage", (message) => {
         const elapsedTime = this.calculateElapsedTime(message.sendAt);
+        if(message.content.startsWith('http')){
+            // this.linkPreviews[message.content] = this.fetchLinkPreview(message.content);
+            this.fetchLinkPreview(message.content);
+            console.log(message.content);
+          }
         this.messages.push( {sender: message.fromUser, content: message.content, sendAt: elapsedTime} );
         this.scrollToBottom();
         this.calculateMessageSize();
