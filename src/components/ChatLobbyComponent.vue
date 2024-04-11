@@ -80,7 +80,7 @@ library.add(fas)
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM15.41 7.41L13 9.83L10.59 7.41L9.17 8.83L11.59 11.25L9.17 13.66L10.59 15.08L13 12.66L15.41 15.08L16.83 13.66L14.41 11.25L16.83 8.83L15.41 7.41Z" fill="grey"/>
           </svg>
-        </button>s
+        </button>
       </div>
     </div>
     <!-- <input ref="textInput" type="text" v-model="text" @paste="handlePaste"> -->
@@ -97,12 +97,40 @@ library.add(fas)
           <div class="q-pa-md cursor-pointer" >
             <div>
                 <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
+                  <font-awesome-icon :icon="['fas', 'face-grin-wide']" />
+                  <q-menu anchor="top start" self="bottom middle text-dark">
+                    <q-item clickable>
+                      <q-item-section @click="this.text += ':)'">
+                        <img src="../assets/images/emojis/emoji1.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':P'">
+                        <img src="../assets/images/emojis/emoji2.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':O'">
+                        <img src="../assets/images/emojis/emoji3.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':-)'">
+                        <img src="../assets/images/emojis/emoji4.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += 'B|'">
+                        <img src="../assets/images/emojis/emoji5.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':D'">
+                        <img src="../assets/images/emojis/emoji6.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += '<3'">
+                        <img src="../assets/images/emojis/emoji7.png" alt="">
+                      </q-item-section>
+                    </q-item>
+                  </q-menu>
+                </q-avatar>
+                <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
                   <font-awesome-icon :icon="['fas', 'image']" @click="openFileDialog" />
                 </q-avatar>
             </div>
           </div>
         </template>
-
+        
         <template v-slot:after>
           <div round dense flat @click="sendMessage" class="cursor-pointer">
             <font-awesome-icon :icon="['fas', 'paper-plane']" />
