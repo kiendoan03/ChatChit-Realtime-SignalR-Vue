@@ -173,6 +173,7 @@ export default {
   },
   mounted() {
     this.getUser();
+    this.scrollToBottom();
   },
   watch: {
             '$route.params.id': function(newId) {

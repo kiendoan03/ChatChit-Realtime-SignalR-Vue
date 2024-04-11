@@ -172,6 +172,7 @@ export default {
   },
   mounted() {
     this.getUser();
+    this.scrollToBottom();
   },
   methods: {
     cancelImage() {

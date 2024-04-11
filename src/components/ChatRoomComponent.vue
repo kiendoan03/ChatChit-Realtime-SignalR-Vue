@@ -180,6 +180,7 @@ export default {
   mounted() {
     this.getUser();
     this.room.id = this.$route.params.id;
+    this.scrollToBottom();
   },
   watch: {
             '$route.params.id': function(newId, oldId ) {
