@@ -18,6 +18,7 @@
         "axios": "^1.6.8",
         "bootstrap": "^5.3.3",
         "compressorjs": "^1.2.1",
+        "link-preview-js": "^3.0.5",
         "quasar": "^2.15.1",
         "vue": "^3.4.21",
         "vue-axios": "^3.5.2",
