@@ -129,10 +129,10 @@
                                 <q-item-label class ="text-white"><font-awesome-icon :icon="['fas', 'user-group']" size="2xs" />  {{ room.roomName }}</q-item-label>
                                 <q-item-label caption lines="1" class="text-grey-6" style="width: 15vmax;">
                                   <template v-if="lastMessageRoom[room.id]">
-                                    <span class ="text-secondary" v-if="lastMessageRoom[room.id].fromUser != this.user.name">
+                                    <span class ="text-secondary" v-if="lastMessageRoom[room.id].fromUser != '' && lastMessageRoom[room.id].fromUser != this.user.name">
                                        {{ lastMessageRoom[room.id].fromUser }}:
                                     </span>
-                                    <span class="text-secondary" v-else >
+                                    <span class="text-secondary" v-else-if="lastMessageRoom[room.id].fromUser != ''" >
                                       You:
                                     </span>
                                     <span>
@@ -439,14 +439,24 @@ import { RouterLink } from 'vue-router'
       },
       listenForLastMessageInRoom(roomId){
         this.connection.on("ReceiveLastMessageInRoom" +  roomId, (message) => {
-          const elapsedTime = this.calculateElapsedTime(message.sendAt);
+          if(message && message.sendAt){
+            const elapsedTime = this.calculateElapsedTime(message.sendAt);
 
             this.lastMessageRoom[roomId] = {
-            fromUser: message.fromUser,
-            content: message.content,
-            sentAt: elapsedTime,
-            roomId: message.room,
-          };
+              fromUser: message.fromUser,
+              content: message.content,
+              sentAt: elapsedTime,
+              roomId: message.room,
+            };
+          }
+          else{
+            this.lastMessageRoom[roomId] = {
+              fromUser: '',
+              content: '',
+              sentAt: '',
+              roomId: '',
+            };
+          }
         });
       },
       getLastMessagePrivate(senderId, receiverId){

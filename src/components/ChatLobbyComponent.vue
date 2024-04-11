@@ -210,6 +210,7 @@ export default {
       }
     },
     fetchLinkPreview(link) {
+      console.log("Fetching link preview for: ", link);
       try {
         axios.get(`https://localhost:7014/Messages?url=${link}`)
         .then(response => {
@@ -275,6 +276,9 @@ export default {
             id: message.id,
             sendAt: elapsedTime
           });
+          this.messages.sort((a, b) => {
+                  return a.id - b.id; 
+              });
         });
 
         this.calculateMessageSize();
