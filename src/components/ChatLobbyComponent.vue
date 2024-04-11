@@ -61,7 +61,13 @@ library.add(fas)
           </q-avatar>
       </template>
       <div v-if="!message.content.startsWith('http')" >
-        <span v-html="message.content" ></span>
+        <div v-if="message.parent != null">
+          <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply']" /> Reply: {{ message.parent }}</div>
+          <span v-html="message.content" ></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" ></span>
+        </div>
       </div>
       <div v-else>
         <div v-if="linkPreviews[message.content]">
