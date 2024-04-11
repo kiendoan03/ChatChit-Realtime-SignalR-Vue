@@ -27,7 +27,13 @@ library.add(fas)
           </q-avatar>
         </template>
       <div v-if="!message.content.startsWith('http')" >
-        <span v-html="message.content" ></span>
+        <div v-if="message.parent != null">
+          <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply']" /> Reply: {{ message.parent }}</div>
+          <span v-html="message.content" ></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" ></span>
+        </div>
       </div>
       <div v-else>
         <div v-if="linkPreviews[message.content]">
@@ -163,7 +169,8 @@ export default {
         fromUserId:''
       },
       pastedImage: null,
-      linkPreviews: {}
+      linkPreviews: {},
+      parentMessageId: null,
     };
    
   },
@@ -273,11 +280,13 @@ export default {
             this.fetchLinkPreview(message.content);
             console.log(message.content);
           }
+          console.log(message);
           this.messages.push({
             sender: message.fromUser,
             content: message.content,
             id: message.id,
-            sendAt: elapsedTime
+            sendAt: elapsedTime,
+            parent: message.parent
           });
           this.messages.sort((a, b) => {
                   return a.id - b.id; 
@@ -409,7 +418,7 @@ export default {
       }else{
         if (this.text.trim() !== "") {
           console.log("Sending message: ", this.text);
-          this.connection.invoke("SendMessage", this.userId, this.text)
+          this.connection.invoke("SendMessage", this.userId, this.text,null)
             .then(() => {
               console.log("Message sent successfully");
               this.text = ""; // Clear input field after sending message
