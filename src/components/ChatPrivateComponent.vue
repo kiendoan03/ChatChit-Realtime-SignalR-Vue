@@ -35,7 +35,7 @@ library.add(fas)
                 {{ message.content }}
               </a>
               <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
-                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
                 <div>{{ linkPreviews[message.content].title }}</div>
               </a>
             </div>
@@ -63,7 +63,7 @@ library.add(fas)
                 {{ message.content }}
               </a>
               <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
-                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
                 <div>{{ linkPreviews[message.content].title }}</div>
               </a>
             </div>
