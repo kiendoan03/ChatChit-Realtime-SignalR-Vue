@@ -92,7 +92,7 @@ library.add(fas)
           </div>
           <div class="q-pa-md cursor-pointer" >
             <div>
-              <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
+              <q-avatar class="cursor-pointer" style="width: 50px; height: 50px;">
                   <font-awesome-icon :icon="['fas', 'face-grin-wide']" />
                   <q-menu anchor="top start" self="bottom middle text-dark">
                     <q-item clickable>
@@ -120,7 +120,7 @@ library.add(fas)
                     </q-item>
                   </q-menu>
                 </q-avatar>
-                <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
+                <q-avatar class="cursor-pointer" style="width: 50px; height: 50px;">
                   <font-awesome-icon :icon="['fas', 'image']" @click="openFileDialog" />
                 </q-avatar>
             </div>
