@@ -91,6 +91,8 @@ library.add(fas)
 <script>
   import * as signalR from "@aspnet/signalr";
   import  axios  from 'axios'
+  import Compressor from 'compressorjs'
+
 export default {
     name: 'ChatLobbyComponent',
   data() {
@@ -122,7 +124,6 @@ export default {
     //   return true;
     // },
     cancelImage() {
-      // Hủy bỏ hình ảnh
       this.pastedImage = null;
     },
     handlePaste(event) {
@@ -140,6 +141,31 @@ export default {
         // Nếu phần tử được paste là hình ảnh, xử lý nó
         if (item.type.indexOf('image') !== -1) {
           const blob = item.getAsFile();
+
+        //   const compressorPromise = new Promise((resolve, reject) => {
+        //   new Compressor(blob, {
+        //     quality: 0.4, // Chất lượng nén ảnh (0-1)
+        //     success: (compressedBlob) => {
+        //       console.log("Image compressed successfully:", compressedBlob);
+        //       resolve(compressedBlob);
+        //     },
+        //     error: (error) => {
+        //       reject(error);
+        //     },
+        //   });
+        // });
+
+        // compressorPromise.then((compressedBlob) => {
+        //   const reader = new FileReader();
+        //   reader.onload = (event) => {
+        //     this.pastedImage = event.target.result;
+        //     console.log(this.pastedImage);
+        //   };
+        //   reader.readAsDataURL(compressedBlob);
+        // }).catch((error) => {
+        //   console.error('Error compressing image:', error);
+        // });
+
           const reader = new FileReader();
 
           // Đọc hình ảnh và hiển thị nó
@@ -284,18 +310,49 @@ export default {
       });
     },
     sendMessage() {
-      if (this.text.trim() !== "") {
-        console.log("Sending message: ", this.text);
-        this.connection.invoke("SendMessage", this.userId, this.text)
-          .then(() => {
-            console.log("Message sent successfully");
-            this.text = ""; // Clear input field after sending message
-            this.getLastMessageInLobby();
-          })
-          .catch((error) => {
-            console.error("Error sending message: ", error);
-          });
+      if(this.pastedImage){
+        console.log("Sending image: ", this.pastedImage);
+        const byteCharacters = atob(this.pastedImage.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const fileBlob = new Blob([byteArray], { type: 'image/png' });
+        const file = new File([fileBlob], 'image.png', { type: 'image/png' });
+        console.log(file);
+        this.uploadFile.file = file;
+        this.uploadFile.fromUserId = this.userId;
+        axios.post('https://localhost:7014/api/Uploads/UploadToLobby', this.uploadFile, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(response => {
+          console.log(response.data);
+          this.text = response.data;
+          console.log(this.text);
+          this.text = '';
+          this.pastedImage = null;
+          // this.listenForMessages();
+          this.scrollToBottom();
+        }).catch(error => {
+          console.error('Error uploading file: ', error);
+        });
+      }else{
+        if (this.text.trim() !== "") {
+          console.log("Sending message: ", this.text);
+          this.connection.invoke("SendMessage", this.userId, this.text)
+            .then(() => {
+              console.log("Message sent successfully");
+              this.text = ""; // Clear input field after sending message
+              this.getLastMessageInLobby();
+            })
+            .catch((error) => {
+              console.error("Error sending message: ", error);
+            });
+        }
       }
+      
     },
     handleFileSelection(event) {
       const selectedFile = event.target.files[0];
