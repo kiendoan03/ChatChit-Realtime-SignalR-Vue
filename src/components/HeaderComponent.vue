@@ -422,13 +422,24 @@ import { RouterLink } from 'vue-router'
       listenForLastMessageInLobby(){
         this.connection.on("ReceiveLastMessageInLobby", (message) => {
           const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
-          this.lastMessageLobby = {
-            fromUser: message.fromUser,
-            content: message.content,
-            sentAt: elapsedTime,
-          };
-
+          if(message && message.sendAt){
+            if(message.content.startsWith('<a')){
+              message.content = 'Sent an image';
+            }else{
+              message.content = message.content;
+            }
+            this.lastMessageLobby = {
+              fromUser: message.fromUser,
+              content: message.content,
+              sentAt: elapsedTime,
+            };
+          }else{
+            this.lastMessageLobby = {
+              fromUser: '',
+              content: '',
+              sentAt: '',
+            };
+          }
         });
       },
       getLastMessageInRoom(roomId){
@@ -441,7 +452,11 @@ import { RouterLink } from 'vue-router'
         this.connection.on("ReceiveLastMessageInRoom" +  roomId, (message) => {
           if(message && message.sendAt){
             const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
+            if(message.content.startsWith('<a')){
+              message.content = 'Sent an image';
+            }else{
+              message.content = message.content;
+            }
             this.lastMessageRoom[roomId] = {
               fromUser: message.fromUser,
               content: message.content,
@@ -469,7 +484,11 @@ import { RouterLink } from 'vue-router'
         this.connection.on("ReceiveLastMessagePrivate" + receiverId, (message) => {
           if(message && message.sendAt){
              const elapsedTime = this.calculateElapsedTime(message.sendAt);
-
+             if(message.content.startsWith('<a')){
+              message.content = 'Sent an image';
+            }else{
+              message.content = message.content;
+            }
             this.lastMessagePrivate[receiverId] = {
               fromUser: message.fromUser,
               content: message.content,
