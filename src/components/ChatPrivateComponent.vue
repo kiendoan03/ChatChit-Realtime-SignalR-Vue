@@ -294,6 +294,7 @@ export default {
         console.log(this.text);
         this.text = '';
         this.listenForMessages();
+        this.getLastMessagePrivate(this.userId, this.$route.params.id);
         this.scrollToBottom();
       }).catch(error => {
         console.error('Error uploading file: ', error);
@@ -341,6 +342,7 @@ export default {
               this.text = ''; 
               this.pastedImage = null;
               this.listenForMessages();
+              this.getLastMessagePrivate(this.userId, this.$route.params.id);
               this.scrollToBottom();
             }).catch(error => {
               console.error('Error uploading file: ', error);
@@ -353,6 +355,7 @@ export default {
                         console.log("Message sent successfully");
                         this.text = ""; // Clear input field after sending message
                         this.getLastMessagePrivate(this.userId, this.$route.params.id);
+                        this.scrollToBottom();
                     })
                     .catch((error) => {
                         console.error("Error sending message: ", error);

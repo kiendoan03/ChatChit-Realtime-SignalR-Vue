@@ -340,6 +340,8 @@ export default {
         console.log(this.text);
         this.text = '';
         this.listenForMessages(roomId);
+        const roomId_int = parseInt(roomId);
+        this.getLastMessageInRoom(roomId_int);
         this.scrollToBottom();
       }).catch(error => {
         console.error('Error uploading file: ', error);
@@ -370,6 +372,8 @@ export default {
               this.text = '';
               this.pastedImage = null;
               this.listenForMessages(roomId);
+              const roomId_int = parseInt(roomId);
+              this.getLastMessageInRoom(roomId_int);
               this.scrollToBottom();
             }).catch(error => {
               console.error('Error uploading file: ', error);
@@ -383,6 +387,7 @@ export default {
                         this.text = ""; 
                         const roomId_int = parseInt(roomId);
                         this.getLastMessageInRoom(roomId_int);
+                        this.scrollToBottom();
                     })
                     .catch((error) => {
                         console.error("Error sending message: ", error);
