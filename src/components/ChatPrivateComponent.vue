@@ -92,6 +92,34 @@ library.add(fas)
           </div>
           <div class="q-pa-md cursor-pointer" >
             <div>
+              <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
+                  <font-awesome-icon :icon="['fas', 'face-grin-wide']" />
+                  <q-menu anchor="top start" self="bottom middle text-dark">
+                    <q-item clickable>
+                      <q-item-section @click="this.text += ':)'">
+                        <img src="../assets/images/emojis/emoji1.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':P'">
+                        <img src="../assets/images/emojis/emoji2.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':O'">
+                        <img src="../assets/images/emojis/emoji3.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':-)'">
+                        <img src="../assets/images/emojis/emoji4.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += 'B|'">
+                        <img src="../assets/images/emojis/emoji5.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += ':D'">
+                        <img src="../assets/images/emojis/emoji6.png" alt="">
+                      </q-item-section>
+                      <q-item-section @click="this.text += '<3'">
+                        <img src="../assets/images/emojis/emoji7.png" alt="">
+                      </q-item-section>
+                    </q-item>
+                  </q-menu>
+                </q-avatar>
                 <q-avatar class="cursor-pointer" style="width: 50px; height: 50px; z-index: 100;">
                   <font-awesome-icon :icon="['fas', 'image']" @click="openFileDialog" />
                 </q-avatar>
