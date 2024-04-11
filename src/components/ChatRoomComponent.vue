@@ -139,7 +139,7 @@ library.add(fas)
           </div>
         </template>
     </q-input>
-    <input ref="fileInput" id="fileInput" type="file" style="display: none" @change="handleFileSelection(this.room.id)">
+    <input ref="fileInput" id="fileInput" type="file" accept="image/jpeg, image/png" style="display: none" @change="handleFileSelection(this.room.id)">
   </div>
   
 </template>
