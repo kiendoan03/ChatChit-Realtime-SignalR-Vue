@@ -282,12 +282,11 @@ export default {
                 'Content-Type': 'multipart/form-data'
               }
             }).then(response => {
-              this.pastedImage = null;
               console.log(response.data);
               this.text = response.data;
               console.log(this.text);
               this.text = '';
-             
+              this.pastedImage = null;
               this.listenForMessages(roomId);
               this.scrollToBottom();
             }).catch(error => {
