@@ -30,10 +30,13 @@ library.add(fas)
           </div>
           <div v-else>
             <div v-if="linkPreviews[message.content]">
-                <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
-                  <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
-                  <div>{{ linkPreviews[message.content].title }}</div>
-                </a>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+                {{ message.content }}
+              </a>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+                <div>{{ linkPreviews[message.content].title }}</div>
+              </a>
             </div>
               <div v-else>
                 <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
@@ -55,8 +58,11 @@ library.add(fas)
       </div>
       <div v-else>
         <div v-if="linkPreviews[message.content]">
-            <a :href="message.content" target="_blank" rel="noopener noreferrer" >{{ message.content }}
-              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
               <div>{{ linkPreviews[message.content].title }}</div>
             </a>
         </div>
