@@ -28,20 +28,20 @@ library.add(fas)
         </template>
       <div v-if="!message.content.startsWith('http')" >
         <q-button
-          class="text-blue-grey-8 cursor-pointer"
+          class="text-blue-grey-8 cursor-pointer "
           style="text-decoration:underline;"
           @click="parentMessageId = message.id, replyText = message.content"
         >
-        <div class="q-mb-sm " >
-          <font-awesome-icon :icon="['fas', 'reply']" /> Reply
-        </div>
+        <q-avatar class="q-mb-sm " color="grey" size="xs">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
         </q-button>
         <div v-if="message.parent != null" >
           <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
-          <span v-html="message.content" ></span>
+          <span v-html="message.content" class="message"></span>
         </div>
         <div v-else>
-          <span v-html="message.content" ></span>
+          <span v-html="message.content" class="message"></span>
         </div>
       </div>
       <div v-else>
@@ -50,9 +50,9 @@ library.add(fas)
           style="text-decoration:underline;"
           @click="parentMessageId = message.id, replyText = message.content"
         >
-        <div class="q-mb-sm">
-          <font-awesome-icon :icon="['fas', 'reply']" /> Reply
-        </div>
+        <q-avatar color="grey" size ="xs" class="q-mb-sm">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
         </q-button>
         <div v-if="linkPreviews[message.content]">
           <div v-if="message.parent != null">
@@ -86,6 +86,7 @@ library.add(fas)
           </div>
       </div>
       </q-chat-message>
+      
       <q-chat-message v-else
         :name="[message.sender]"
         :size = "messageSize[index]"
@@ -98,35 +99,39 @@ library.add(fas)
       </template>
       <div v-if="!message.content.startsWith('http')" >
         <q-button
-          class="text-blue-grey-8 cursor-pointer "
-          style="text-decoration:underline"
-          @click="parentMessageId = message.id, replyText = message.content"
-        >
-        <div class="q-mb-sm text-right">
-          <font-awesome-icon :icon="['fas', 'reply']" /> Reply
-        </div>
-        </q-button>
-        <div v-if="message.parent != null">
-          <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
-          <span v-html="message.content" ></span>
-        </div>
-        <div v-else>
-          <span v-html="message.content" ></span>
-        </div>
-      </div>
-      <div v-else>
-        <q-button
           class="text-blue-grey-8 cursor-pointer"
           style="text-decoration:underline"
           @click="parentMessageId = message.id, replyText = message.content"
         >
-        <div class="q-mb-sm text-right">
-          <font-awesome-icon :icon="['fas', 'reply']" /> Reply
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
+        </div>
+        </q-button>
+        <div v-if="message.parent != null">
+          <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <span v-html="message.content" class="message" ></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" class="message" ></span>
+        </div>
+      </div>
+      <div v-else>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer text-right"
+          style="text-decoration:underline"
+          @click="parentMessageId = message.id, replyText = message.content"
+        >
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
         </div>
         </q-button>
         <div v-if="linkPreviews[message.content]">
           <div v-if="message.parent != null">
-            <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+            <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
             <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
               {{ message.content }}
             </a>
@@ -147,7 +152,7 @@ library.add(fas)
         </div>
           <div v-else>
             <div v-if="message.parent != null">
-              <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
               <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
             </div>
             <div v-else>
@@ -156,7 +161,7 @@ library.add(fas)
           </div>
       </div>
       </q-chat-message>
-     
+      
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
@@ -566,10 +571,10 @@ export default {
 </script>
 
 <style>
-.post-image {
-    width: 20vmax !important; 
-},
+.message a .post-image {
+    width: 20vmax ; 
+}
 .reply a .post-image {
-  width: 5vmax !important;
+  width: 5vmax ;
 }
 </style>
