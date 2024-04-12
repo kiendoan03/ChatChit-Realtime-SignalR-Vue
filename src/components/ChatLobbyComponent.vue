@@ -262,7 +262,8 @@ export default {
       messageSize: [], 
       uploadFile:{
         file: '',
-        fromUserId:''
+        fromUserId:'',
+        parentId: null
       },
       pastedImage: null,
       linkPreviews: {},
@@ -497,6 +498,8 @@ export default {
         console.log(file);
         this.uploadFile.file = file;
         this.uploadFile.fromUserId = this.userId;
+        this.uploadFile.parentId = this.parentMessageId;
+        console.log(this.uploadFile);
         axios.post('https://localhost:7014/api/Uploads/UploadToLobby', this.uploadFile, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -507,6 +510,7 @@ export default {
           console.log(this.text);
           this.text = '';
           this.pastedImage = null;
+          this.parentMessageId = null;
           this.getLastMessageInLobby();
           // this.listenForMessages();
           this.scrollToBottom();
@@ -536,6 +540,7 @@ export default {
       console.log(selectedFile);
       this.uploadFile.file = selectedFile;
       this.uploadFile.fromUserId = this.userId;
+      this.uploadFile.parentId = this.parentMessageId;
       axios.post('https://localhost:7014/api/Uploads/UploadToLobby', this.uploadFile, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -545,6 +550,7 @@ export default {
         this.text = response.data;
         console.log(this.text);
         this.text = '';
+        this.parentMessageId = null;
         // this.listenForMessages();
         this.getLastMessageInLobby();
         this.scrollToBottom();

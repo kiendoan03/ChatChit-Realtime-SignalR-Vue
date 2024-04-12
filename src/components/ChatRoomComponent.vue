@@ -170,7 +170,9 @@ export default {
         roomId: '',
       },
       pastedImage: null,
-      linkPreviews: {}
+      linkPreviews: {},
+      parentMessageId: null,
+      replyText: "",
     };
    
   },
@@ -319,7 +321,7 @@ export default {
                 console.log(message);
                 this.scrollToBottom();
                 this.calculateMessageSize();
-              }
+              } 
             }
           });
       }
