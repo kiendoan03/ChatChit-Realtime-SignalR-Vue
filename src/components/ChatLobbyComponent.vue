@@ -107,7 +107,7 @@ library.add(fas)
         </div>
         </q-button>
         <div v-if="message.parent != null">
-          <div class="text-info"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
           <span v-html="message.content" ></span>
         </div>
         <div v-else>
@@ -126,7 +126,7 @@ library.add(fas)
         </q-button>
         <div v-if="linkPreviews[message.content]">
           <div v-if="message.parent != null">
-            <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+            <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
             <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
               {{ message.content }}
             </a>
@@ -147,7 +147,7 @@ library.add(fas)
         </div>
           <div v-else>
             <div v-if="message.parent != null">
-              <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <div class="text-dark"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
               <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
             </div>
             <div v-else>
