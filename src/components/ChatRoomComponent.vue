@@ -12,37 +12,80 @@ library.add(fas)
 
 <template >
   <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
-    <div class="" v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
+    <div  v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
-        :size = "messageSize[index]"
+        :size= "messageSize[index]"
         sent
         :stamp="[message.sendAt]"
-        v-if="message.sender === this.user"
+        v-if="message.sender === this.user "
       >
         <template v-slot:avatar >
-            <q-avatar color="pink-3" text-color="white"  class="q-message-avatar q-message-avatar--sent">
-              {{ generateAvatarFromName(this.user) }}
-            </q-avatar>
-          </template>
-          <div v-if="!message.content.startsWith('http')" >
-            <span v-html="message.content" ></span>
+          <q-avatar color="pink-3" text-color="white"  class="q-message-avatar q-message-avatar--sent">
+            {{ generateAvatarFromName(this.user) }}
+          </q-avatar>
+        </template>
+      <div v-if="!message.content.startsWith('http')" >
+        <q-button
+          class="text-blue-grey-8 cursor-pointer "
+          style="text-decoration:underline;"
+          @click="parentMessageId = message.id, replyText = message.content"
+        >
+        <q-avatar class="q-mb-sm " color="grey" size="xs">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
+        </q-button>
+        <div v-if="message.parent != null" >
+          <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <span v-html="message.content" class="message"></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" class="message"></span>
+        </div>
+      </div>
+      <div v-else>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer"
+          style="text-decoration:underline;"
+          @click="parentMessageId = message.id, replyText = message.content"
+        >
+        <q-avatar color="grey" size ="xs" class="q-mb-sm">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
+        </q-button>
+        <div v-if="linkPreviews[message.content]">
+          <div v-if="message.parent != null">
+            <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
           </div>
           <div v-else>
-            <div v-if="linkPreviews[message.content]">
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
-                {{ message.content }}
-              </a>
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
-                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
-                <div>{{ linkPreviews[message.content].title }}</div>
-              </a>
-            </div>
-              <div v-else>
-                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
-              </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
           </div>
+        </div>
+          <div v-else>
+            <div v-if="message.parent != null">
+              <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+            <div v-else>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+          </div>
+      </div>
       </q-chat-message>
+      
       <q-chat-message v-else
         :name="[message.sender]"
         :size = "messageSize[index]"
@@ -54,10 +97,40 @@ library.add(fas)
           </q-avatar>
       </template>
       <div v-if="!message.content.startsWith('http')" >
-        <span v-html="message.content" ></span>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer"
+          style="text-decoration:underline"
+          @click="parentMessageId = message.id, replyText = message.content"
+        >
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
+        </div>
+        </q-button>
+        <div v-if="message.parent != null">
+          <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <span v-html="message.content" class="message" ></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" class="message" ></span>
+        </div>
       </div>
       <div v-else>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer text-right"
+          style="text-decoration:underline"
+          @click="parentMessageId = message.id, replyText = message.content"
+        >
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
+        </div>
+        </q-button>
         <div v-if="linkPreviews[message.content]">
+          <div v-if="message.parent != null">
+            <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
             <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
               {{ message.content }}
             </a>
@@ -65,13 +138,29 @@ library.add(fas)
               <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
               <div>{{ linkPreviews[message.content].title }}</div>
             </a>
+          </div>  
+          <div v-else>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
+          </div>
         </div>
           <div v-else>
-            <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            <div v-if="message.parent != null">
+              <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+            <div v-else>
+               <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
           </div>
       </div>
       </q-chat-message>
-
+      
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
@@ -85,6 +174,18 @@ library.add(fas)
         </button>
       </div>
     </div>
+    <q-input filled v-model="replyText" style="width: 100%;" v-show="parentMessageId">
+      <template v-slot:before>
+          <q-avatar>
+            <font-awesome-icon :icon="['fas', 'reply']" size ="xl" color="grey" />
+          </q-avatar>
+      </template>
+      <template v-slot:after>
+        <div  name="close" class="cursor-pointer" @click="parentMessageId = null, replyText=''">
+            <font-awesome-icon :icon="['fas', 'xmark']" size="lg" />
+        </div>
+      </template>
+    </q-input>
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessageToRoom(this.room.id )"  @paste="handlePaste"  style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar color="pink-3" text-color="white">
@@ -135,7 +236,7 @@ library.add(fas)
 
         <template v-slot:after>
           <div round dense flat @click="sendMessageToRoom(this.room.id )" class="cursor-pointer">
-            <font-awesome-icon :icon="['fas', 'paper-plane']" />
+            <font-awesome-icon :icon="['fas', 'paper-plane']" size="sm" />
           </div>
         </template>
     </q-input>
@@ -168,6 +269,7 @@ export default {
         file: '',
         fromUserId:'',
         roomId: '',
+        parentId: null
       },
       pastedImage: null,
       linkPreviews: {},
@@ -317,7 +419,7 @@ export default {
                   this.fetchLinkPreview(message.content);
                   console.log(message.content);
                 }
-                this.messages.push({ sender: message.fromUser, content: message.content, id: message.id, sendAt: elapsedTime});
+                this.messages.push({ sender: message.fromUser, content: message.content, id: message.id, sendAt: elapsedTime, parent: message.parent, ownerParent: message.ownerParent});
                 console.log(message);
                 this.scrollToBottom();
                 this.calculateMessageSize();
@@ -333,6 +435,7 @@ export default {
       this.uploadFile.file = selectedFile;
       this.uploadFile.fromUserId = this.userId;
       this.uploadFile.roomId = roomId;
+      this.uploadFile.parentId = this.parentMessageId;
       axios.post('https://localhost:7014/api/Uploads/UploadToRoom', this.uploadFile, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -342,6 +445,7 @@ export default {
         this.text = response.data;
         console.log(this.text);
         this.text = '';
+        this.parentMessageId = null;
         this.listenForMessages(roomId);
         const roomId_int = parseInt(roomId);
         this.getLastMessageInRoom(roomId_int);
@@ -364,6 +468,7 @@ export default {
             this.uploadFile.file = file;
             this.uploadFile.fromUserId = this.userId;
             this.uploadFile.roomId = roomId;
+            this.uploadFile.parentId = this.parentMessageId;
             axios.post('https://localhost:7014/api/Uploads/UploadToRoom', this.uploadFile, {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -374,6 +479,7 @@ export default {
               console.log(this.text);
               this.text = '';
               this.pastedImage = null;
+              this.parentMessageId = null;
               this.listenForMessages(roomId);
               const roomId_int = parseInt(roomId);
               this.getLastMessageInRoom(roomId_int);
@@ -384,10 +490,11 @@ export default {
           }else{
             if (this.text.trim() !== "") {
                 console.log("Sending message to room...");
-                this.connection.invoke("SendToRoom", this.userId,roomId, this.text)
+                this.connection.invoke("SendToRoom", this.userId,roomId, this.text, this.parentMessageId)
                     .then(() => {
                         console.log("Message sent successfully");
                         this.text = ""; 
+                        this.parentMessageId = null;
                         const roomId_int = parseInt(roomId);
                         this.getLastMessageInRoom(roomId_int);
                         this.scrollToBottom();
@@ -421,7 +528,9 @@ export default {
                 sender: message.fromUser,
                 content: message.content,
                 id: message.id,
-                sendAt: elapsedTime
+                sendAt: elapsedTime,
+                parent: message.parent,
+                ownerParent: message.ownerParent
               });
               this.messages.sort((a, b) => {
                   return a.id - b.id; 
