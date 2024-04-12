@@ -13,65 +13,155 @@ library.add(fas)
 
 <template >
   <div ref="scrollContainer" class="q-pa-md row scroll text-dark" style="height:33.4vmax;"  >
-    <div v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
+    <div  v-for="(message, index) in messages" :key="message.id" style="width: 100%;">
       <q-chat-message 
         name="Me"
-        :size="messageSize[index]"
+        :size= "messageSize[index]"
         sent
         :stamp="[message.sendAt]"
-        v-if="message.sender === this.user"
+        v-if="message.sender === this.user "
       >
         <template v-slot:avatar >
-            <q-avatar color="pink-3" text-color="white"  class="q-message-avatar q-message-avatar--sent">
-              {{ generateAvatarFromName(this.user) }}
-            </q-avatar>
-          </template>
-          <div v-if="!message.content.startsWith('http')" >
-            <span v-html="message.content" ></span>
+          <q-avatar color="pink-3" text-color="white"  class="q-message-avatar q-message-avatar--sent">
+            {{ generateAvatarFromName(this.user) }}
+          </q-avatar>
+        </template>
+      <div v-if="!message.content.startsWith('http')" >
+        <q-button
+          class="text-blue-grey-8 cursor-pointer "
+          style="text-decoration:underline;"
+          @click="setParentId(message.id, message.content)"
+        >
+        <q-avatar class="q-mb-sm " color="grey" size="xs">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
+        </q-button>
+        <div v-if="message.parent != null" >
+          <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <span v-html="message.content" class="message"></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" class="message"></span>
+        </div>
+      </div>
+      <div v-else>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer"
+          style="text-decoration:underline;"
+          @click="setParentId(message.id, message.content)"
+        >
+        <q-avatar color="grey" size ="xs" class="q-mb-sm">
+          <font-awesome-icon :icon="['fas', 'reply']" /> 
+        </q-avatar>
+        </q-button>
+        <div v-if="linkPreviews[message.content]">
+          <div v-if="message.parent != null">
+            <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
           </div>
           <div v-else>
-            <div v-if="linkPreviews[message.content]">
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
-                {{ message.content }}
-              </a>
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
-                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
-                <div>{{ linkPreviews[message.content].title }}</div>
-              </a>
-            </div>
-              <div v-else>
-                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
-              </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 20vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
           </div>
+        </div>
+          <div v-else>
+            <div v-if="message.parent != null">
+              <div class="text-secondary"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+            <div v-else>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+          </div>
+      </div>
       </q-chat-message>
+      
       <q-chat-message v-else
         :name="[message.sender]"
-        :size="messageSize[index]"
+        :size = "messageSize[index]"
         :stamp="[message.sendAt]" 
       >
-        <template v-slot:avatar >
-            <q-avatar color="primary" text-color="white"   class="q-message-avatar q-message-avatar--received">
-              {{ generateAvatarFromName(message.sender) }}
-            </q-avatar>
-        </template>
-        <div v-if="!message.content.startsWith('http')" >
-            <span v-html="message.content" ></span>
-          </div>
+      <template v-slot:avatar >
+          <q-avatar color="primary" text-color="white"   class="q-message-avatar q-message-avatar--received">
+            {{ generateAvatarFromName(message.sender) }}
+          </q-avatar>
+      </template>
+      <div v-if="!message.content.startsWith('http')" >
+        <q-button
+          class="text-blue-grey-8 cursor-pointer"
+          style="text-decoration:underline"
+          @click="setParentId(message.id, message.content)"
+        >
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
+        </div>
+        </q-button>
+        <div v-if="message.parent != null">
+          <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+          <span v-html="message.content" class="message" ></span>
+        </div>
+        <div v-else>
+          <span v-html="message.content" class="message" ></span>
+        </div>
+      </div>
+      <div v-else>
+        <q-button
+          class="text-blue-grey-8 cursor-pointer text-right"
+          style="text-decoration:underline"
+          @click="setParentId(message.id, message.content)"
+        >
+        <div class="text-right">
+          <q-avatar color="grey" size ="xs" class="q-mb-sm ">
+            <font-awesome-icon :icon="['fas', 'reply']" /> 
+          </q-avatar>
+        </div>
+        </q-button>
+        <div v-if="linkPreviews[message.content]">
+          <div v-if="message.parent != null">
+            <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
+          </div>  
           <div v-else>
-            <div v-if="linkPreviews[message.content]">
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
-                {{ message.content }}
-              </a>
-              <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
-                <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
-                <div>{{ linkPreviews[message.content].title }}</div>
-              </a>
-            </div>
-              <div v-else>
-                <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
-              </div>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  class="text-dark">
+              {{ message.content }}
+            </a>
+            <a :href="message.content" target="_blank" rel="noopener noreferrer"  style="text-decoration: none;" class="text-dark">
+              <img :src="linkPreviews[message.content].image" alt="Preview Image" style="width: 19vmax; margin: 5px 0 5px 0;" v-if="linkPreviews[message.content].image" />
+              <div>{{ linkPreviews[message.content].title }}</div>
+            </a>
           </div>
+        </div>
+          <div v-else>
+            <div v-if="message.parent != null">
+              <div class="text-blue-grey-1"><font-awesome-icon :icon="['fas', 'reply-all']" /> Reply to {{ message.ownerParent === this.user ? 'Me' : message.ownerParent }}: <span v-html="message.parent" class="reply"></span> </div>
+              <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+            <div v-else>
+               <a :href="message.content" target="_blank" rel="noopener noreferrer">{{ message.content }}</a>
+            </div>
+          </div>
+      </div>
       </q-chat-message>
+      
     </div>
   </div>
   <div class="q-pa-md row justify-center" >
@@ -85,6 +175,18 @@ library.add(fas)
         </button>
       </div>
     </div>
+    <q-input filled v-model="replyText" style="width: 100%;" v-if="parentId != 0" >
+      <template v-slot:before>
+          <q-avatar>
+            <font-awesome-icon :icon="['fas', 'reply']" size ="xl" color="grey" />
+          </q-avatar>
+      </template>
+      <template v-slot:after>
+        <div  name="close" class="cursor-pointer" @click="parentId = 0, replyText=''">
+            <font-awesome-icon :icon="['fas', 'xmark']" size="lg" />
+        </div>
+      </template>
+    </q-input>
     <q-input filled bottom-slots v-model="text"  @keyup.enter="sendMessagePrivate" @paste="handlePaste" style="width: 100%;"  label="Type your message" :dense="dense">
         <template v-slot:before>
           <q-avatar color="pink-3" text-color="white">
@@ -94,7 +196,7 @@ library.add(fas)
 
         <template v-slot:append>
           <div v-if="text !== ''" name="close" @click="text = ''" class="cursor-pointer">
-            <font-awesome-icon :icon="['fas', 'xmark']" />
+            <font-awesome-icon :icon="['fas', 'xmark']" size="sm"/>
           </div>
           <div class="q-pa-md cursor-pointer" >
             <div>
@@ -154,6 +256,8 @@ export default {
       connection: null,
       messages: [],
       text: "",
+      parentId: 0,
+      replyText: "",
       user: "",
       userId: "",
       now: Date.now(),
@@ -162,11 +266,11 @@ export default {
         file: '',
         fromUserId:'',
         toUserId: '',
+        parentId: ''
       },
       pastedImage: null,
-      linkPreviews: {}
+      linkPreviews: {},
     };
-   
   },
   created() {
     this.initSignalRConnection();
@@ -182,6 +286,14 @@ export default {
             },
         },
   methods: {
+    setParentId(messageId, messageContent) {
+      this.parentId = messageId;
+      this.replyText = messageContent;
+      console.log(this.parentId);
+      console.log(this.replyText);
+      console.log(messageId);
+      console.log(messageContent);
+    },
     cancelImage() {
       this.pastedImage = null;
     },
@@ -258,7 +370,7 @@ export default {
                   this.fetchLinkPreview(message.content);
                   console.log(message.content);
                 }
-        this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime} );
+        this.messages.push( {sender:message.fromUser,content:message.content, sendAt: elapsedTime,  parent: message.parent, ownerParent: message.ownerParent} );
         console.log(message);
         this.scrollToBottom();
         this.calculateMessageSize();
@@ -272,7 +384,7 @@ export default {
                   this.fetchLinkPreview(message.content);
                   console.log(message.content);
                 }
-            this.messages.push( {sender:message.fromUser, content:message.content, sendAt: elapsedTime} );
+            this.messages.push( {id: message.id ,sender:message.fromUser, content:message.content, sendAt: elapsedTime, parent: message.parent, ownerParent: message.ownerParent} );
             console.log(this.messages);
             this.scrollToBottom();
             this.calculateMessageSize();
@@ -285,6 +397,7 @@ export default {
       this.uploadFile.file = selectedFile;
       this.uploadFile.fromUserId = this.userId;
       this.uploadFile.toUserId = this.$route.params.id;
+      this.uploadFile.parentId = this.parentId;
       axios.post('https://localhost:7014/api/Uploads/UploadToUser', this.uploadFile, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -294,6 +407,7 @@ export default {
         this.text = response.data;
         console.log(this.text);
         this.text = '';
+        this.parentId = 0;
         this.listenForMessages();
         this.getLastMessagePrivate(this.userId, this.$route.params.id);
         this.scrollToBottom();
@@ -331,6 +445,7 @@ export default {
             this.uploadFile.file = file;
             this.uploadFile.fromUserId = this.userId;
             this.uploadFile.toUserId = this.$route.params.id;
+            this.uploadFile.parentId = this.parentId;
             axios.post('https://localhost:7014/api/Uploads/UploadToUser', this.uploadFile, {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -342,6 +457,8 @@ export default {
               console.log(this.text);
               this.text = ''; 
               this.pastedImage = null;
+              this.parentId = 0;
+              this.replyText = '';
               this.listenForMessages();
               this.getLastMessagePrivate(this.userId, this.$route.params.id);
               this.scrollToBottom();
@@ -351,10 +468,16 @@ export default {
           }else{
             if (this.text.trim() !== "") {
                 console.log("Sending message to room...");
-                this.connection.invoke("SendPrivate", this.userId,this.$route.params.id, this.text)
+                console.log(this.parentId);
+                console.log(this.text);
+                console.log(this.userId);
+                console.log(this.$route.params.id);
+                console.log(this.replyText); 
+                this.connection.invoke("SendPrivate", this.userId,this.$route.params.id, this.text, this.parentId)
                     .then(() => {
                         console.log("Message sent successfully");
                         this.text = ""; // Clear input field after sending message
+                        this.parentId = 0;
                         this.getLastMessagePrivate(this.userId, this.$route.params.id);
                         this.scrollToBottom();
                     })
@@ -452,7 +575,7 @@ export default {
                   this.fetchLinkPreview(message.content);
                   console.log(message.content);
                 }
-                this.messages.push( {sender:message.fromUser, content: message.content, sendAt: elapsedTime});
+                this.messages.push( {id:message.id ,sender:message.fromUser, content: message.content, sendAt: elapsedTime, parent: message.parent, ownerParent: message.ownerParent});
             });
             this.scrollToBottom();
             this.calculateMessageSize();

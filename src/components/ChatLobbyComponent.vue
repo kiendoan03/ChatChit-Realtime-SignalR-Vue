@@ -270,7 +270,6 @@ export default {
       parentMessageId: null,
       replyText: "",
     };
-   
   },
   created() {
     this.initSignalRConnection();
