@@ -203,25 +203,25 @@ library.add(fas)
                   <font-awesome-icon :icon="['fas', 'face-grin-wide']" />
                   <q-menu anchor="top start" self="bottom middle text-dark">
                     <q-item clickable>
-                      <q-item-section @click="this.text += ':)'">
+                      <q-item-section @click="this.text += ':) '">
                         <img src="../assets/images/emojis/emoji1.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += ':P'">
+                      <q-item-section @click="this.text += ':P '">
                         <img src="../assets/images/emojis/emoji2.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += ':O'">
+                      <q-item-section @click="this.text += ':O '">
                         <img src="../assets/images/emojis/emoji3.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += ':-)'">
+                      <q-item-section @click="this.text += ':-) '">
                         <img src="../assets/images/emojis/emoji4.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += 'B|'">
+                      <q-item-section @click="this.text += 'B| '">
                         <img src="../assets/images/emojis/emoji5.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += ':D'">
+                      <q-item-section @click="this.text += ':D '">
                         <img src="../assets/images/emojis/emoji6.png" alt="">
                       </q-item-section>
-                      <q-item-section @click="this.text += '<3'">
+                      <q-item-section @click="this.text += '<3 '">
                         <img src="../assets/images/emojis/emoji7.png" alt="">
                       </q-item-section>
                     </q-item>
